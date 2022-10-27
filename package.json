@@ -1,7 +1,7 @@
 {
   "name": "extml",
   "version": "1.0.0",
-  "description": "",
+  "description": "Converts html tagged templates to ExtJS component object",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -17,7 +17,15 @@
     "type": "git",
     "url": "git+https://github.com/fabioricali/html-to-extjs-object.git"
   },
-  "keywords": [],
+  "keywords": [
+    "extjs",
+    "ext",
+    "sencha",
+    "cmd",
+    "htm",
+    "tagged-template-literals",
+    "html"
+  ],
   "author": "Fabio Ricali",
   "license": "MIT",
   "bugs": {

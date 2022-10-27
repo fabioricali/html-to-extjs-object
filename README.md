@@ -1,5 +1,5 @@
 # extml
-Converts html literal tagged to Extjs component object
+Converts html tagged templates to ExtJS component object
 
 ## Get started
 ```

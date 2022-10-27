@@ -6,7 +6,7 @@ describe('converts html to extjs object', function () {
         let result = extml`
             <segmentedbutton/>
         `;
-        console.log(result)
+        //console.log(result)
         assert.deepEqual(result, {xtype: 'segmentedbutton', items: [], listeners: [], html: ''});
     });
 
@@ -19,7 +19,7 @@ describe('converts html to extjs object', function () {
         let result = extml`
             <${MyComponent}/>
         `;
-        console.log(result)
+        //console.log(result)
         assert.deepEqual(result, {xtype: 'toolbar', items: [], listeners: [], html: ''});
     });
 
@@ -39,7 +39,7 @@ describe('converts html to extjs object', function () {
         let result = extml`
             <${Mother}/>
         `;
-        console.log(result)
+        //console.log(result)
         assert.deepEqual(result, {
             xtype: 'toolbar',
             items: [
@@ -72,7 +72,7 @@ describe('converts html to extjs object', function () {
                 <${Child}/>
             </>
         `;
-        console.log(result)
+        //console.log(result)
         assert.deepEqual(result, {
             xtype: 'toolbar',
             items: [
@@ -97,7 +97,7 @@ describe('converts html to extjs object', function () {
         let result = extml`
             <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}"/>
         `;
-        console.log(result)
+        //console.log(result)
         assert.equal(result.listeners[0].painted, onPaintedHandle)
         assert.equal(result.allowMultiple, true)
         //assert.deepEqual(result, {xtype: 'segmentedbutton', items: [], listeners: {}, html: ''});
@@ -122,7 +122,7 @@ describe('converts html to extjs object', function () {
         let result = extml`
             <${MyComponent} docked="right" hidePanelStats="${true}" onpainted="${onPaintedHandle1}"/>
         `;
-        console.log(result)
+        //console.log(result)
         assert.equal(result.listeners[0].painted, onPaintedHandle2)
         assert.equal(result.listeners[1].painted, onPaintedHandle1)
         assert.equal(result.docked, 'right')
@@ -131,7 +131,7 @@ describe('converts html to extjs object', function () {
         let result2 = extml`
             <${MyComponent} onpainted="${onPaintedHandle1}"/>
         `;
-        console.log(result2)
+        //console.log(result2)
         assert.equal(result2.listeners[0].painted, onPaintedHandle2)
         assert.equal(result2.listeners[1].painted, onPaintedHandle1)
         assert.equal(result2.docked, 'left')
@@ -145,7 +145,7 @@ describe('converts html to extjs object', function () {
                 ${myHtml}
             </toolbar>
         `;
-        console.log(result)
+        //console.log(result)
         assert.deepEqual(result, { xtype: 'toolbar', items: [], listeners: [], html: '<div>sss</div>' });
     });
 

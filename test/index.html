@@ -2,62 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>From html to ext object</title>
+    <title>Converts html tagged templates to ExtJS component object</title>
 </head>
 <body>
 <script type="module">
-    import extml from './dist/extml.es.js'
+    import extml from '../dist/extml.es.js'
 
     export function StartDate(props) {
         //console.log(props)
         //language=html
         return extml`
-            <component xtype="datefield" value="${new Date()}"/>
+            <datefield value="${new Date()}"/>
         `
     }
 
     export function EndDate() {
         //language=html
         return extml`
-            <component xtype="datefield" value="${new Date()}"/>
+            <datefield value="${new Date()}"/>
         `
     }
 
     export function RetrieveButton() {
         //language=html
         return extml`
-            <component xtype="button" ui="action" value="Click me"/>
+            <button ui="action" value="Click me"/>
         `
     }
 
     export function ContainerFoo() {
         //language=html
         return extml`
-            <component xtype="container" oninitialize="${() => {}}"/>
+            <container oninitialize="${() => {}}"/>
         `
     }
 
     export function StatsLabel() {
         //language=html
         return extml`
-            <component xtype="label" html="Stats"/>
+            <label html="Stats"/>
         `
     }
 
     export function MyToolbar() {
         //language=html
         return extml`
-            <component xtype="toolbar" docked="right" style="background: #fff" onpainted="${() => {}}">
+            <toolbar docked="right" style="background: #fff" onpainted="${() => {}}">
                 <${StartDate} option="${123}"/>
                 <${EndDate}/>
                 <${ContainerFoo}>
                     ${`<div>aa</div>`}
                     ${`<div>bb</div>`}
-                    <div>cc</div>
                     <${StatsLabel}/>
                 </>
                 <${RetrieveButton}/>
-            </>
+            </toolbar>
         `
     }
 

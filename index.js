@@ -30,7 +30,7 @@ function createComponentConfig(type, props, children, propsFunction) {
 
     children.forEach(child => {
         if (typeof child === 'string') {
-            console.log(type, child)
+            //console.log(type, child)
             componentConfig.html += child
         } else {
             componentConfig.items.push(child)
