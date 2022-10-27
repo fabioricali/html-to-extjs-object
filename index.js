@@ -1,17 +1,28 @@
 import htm from 'htm'
 
-function createComponentConfig(type, props, children) {
-    //console.log(type, props, children)
+function isListener(prop) {
+    return prop.startsWith('on')
+}
+
+function extractListenerName(prop) {
+    return prop.substring(2)
+}
+
+function createComponentConfig(type, props, children, propsFunction) {
     let componentConfig = {
-        _originType: type,
+        xtype: type.toLowerCase(),
         items: [],
-        listeners: {},
+        listeners: [],
         html: ''
     };
 
+    props = Object.assign({}, props, propsFunction);
+
     for (let prop in props) {
-        if (prop.startsWith('on')) {
-            componentConfig.listeners[prop.substring(2)] = props[prop];
+        if (isListener(prop)) {
+            let event = {}
+            event[extractListenerName(prop)] = props[prop];
+            componentConfig.listeners.push(event);
         } else {
             componentConfig[prop] = props[prop];
         }
@@ -32,11 +43,10 @@ function createComponentConfig(type, props, children) {
 
 function h(type, props, ...children) {
     if (typeof type === 'function') {
-        return createComponentConfig(type.name, type(props), children)
+        return createComponentConfig(type.name, type(props), children, props)
     }
     return createComponentConfig(type, props, children)
 }
 
 const extml = htm.bind(h);
 export default extml;
-
