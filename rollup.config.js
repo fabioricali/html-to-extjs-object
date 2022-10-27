@@ -2,6 +2,14 @@
 import versionInjector from 'rollup-plugin-version-injector';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 
+const versionConfig = {
+    injectInComments: {
+        fileRegexp: /\.(js|html|css)$/,
+        tag: 'Extml, version: {version} - {date}',
+        dateFormat: 'mmmm d, yyyy HH:MM:ss'
+    }
+}
+
 export default {
     input: 'index.js',
     output: [
@@ -16,7 +24,10 @@ export default {
             format: 'umd'
         }
     ],
-    plugins: [nodeResolve()]
+    plugins: [
+        versionInjector(versionConfig),
+        nodeResolve()
+    ]
 }
 
 // import { nodeResolve } from '@rollup/plugin-node-resolve';
