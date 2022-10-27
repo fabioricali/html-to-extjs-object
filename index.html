@@ -6,58 +6,56 @@
 </head>
 <body>
 <script type="module">
-    import htm from 'https://unpkg.com/htm?module'
-
-    function h(type, props, ...children) {
-        //console.log(type, props, children)
-        props = props || {};
-        /*if (type === 'style') {
-            return
-        }*/
-        if (typeof type === 'function') {
-            return type(props)
-        }
-        props.items = children;
-        props.listeners = {};
-        for (let prop in props) {
-            if (prop.startsWith('on')) {
-                props.listeners[prop.substring(2)] = props[prop];
-                delete props[prop];
-            }
-        }
-        return props
-    }
-
-    const ext = htm.bind(h);
+    import extml from './dist/extml.es.js'
 
     export function StartDate(props) {
-        console.log(props)
+        //console.log(props)
         //language=html
-        return ext`
-            <xtype="datefield" value="${new Date()}"/>
+        return extml`
+            <component xtype="datefield" value="${new Date()}"/>
         `
     }
 
     export function EndDate() {
         //language=html
-        return ext`
-            <xtype="datefield" value="${new Date()}"/>
+        return extml`
+            <component xtype="datefield" value="${new Date()}"/>
         `
     }
 
     export function RetrieveButton() {
         //language=html
-        return ext`
-            <xtype="button" ui="action" value="Click me"/>
+        return extml`
+            <component xtype="button" ui="action" value="Click me"/>
+        `
+    }
+
+    export function ContainerFoo() {
+        //language=html
+        return extml`
+            <component xtype="container" oninitialize="${() => {}}"/>
+        `
+    }
+
+    export function StatsLabel() {
+        //language=html
+        return extml`
+            <component xtype="label" html="Stats"/>
         `
     }
 
     export function MyToolbar() {
         //language=html
-        return ext`
-            <xtype="toolbar" docked="right" style="background: #fff" onpainted="${() => {}}">
+        return extml`
+            <component xtype="toolbar" docked="right" style="background: #fff" onpainted="${() => {}}">
                 <${StartDate} option="${123}"/>
                 <${EndDate}/>
+                <${ContainerFoo}>
+                    ${`<div>aa</div>`}
+                    ${`<div>bb</div>`}
+                    <div>cc</div>
+                    <${StatsLabel}/>
+                </>
                 <${RetrieveButton}/>
             </>
         `
