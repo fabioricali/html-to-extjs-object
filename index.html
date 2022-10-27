@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>From html to ext object</title>
+</head>
+<body>
+<script type="module">
+    import htm from 'https://unpkg.com/htm?module'
+
+    function h(type, props, ...children) {
+        //console.log(type, props, children)
+        props = props || {};
+        /*if (type === 'style') {
+            return
+        }*/
+        if (typeof type === 'function') {
+            return type(props)
+        }
+        props.items = children;
+        props.listeners = {};
+        for (let prop in props) {
+            if (prop.startsWith('on')) {
+                props.listeners[prop.substring(2)] = props[prop];
+                delete props[prop];
+            }
+        }
+        return props
+    }
+
+    const ext = htm.bind(h);
+
+    export function StartDate(props) {
+        console.log(props)
+        //language=html
+        return ext`
+            <xtype="datefield" value="${new Date()}"/>
+        `
+    }
+
+    export function EndDate() {
+        //language=html
+        return ext`
+            <xtype="datefield" value="${new Date()}"/>
+        `
+    }
+
+    export function MyToolbar() {
+        //language=html
+        return ext`
+            <xtype="toolbar" docked="right" style="background: #fff" onpainted="${() => {}}">
+                <${StartDate} option="${123}"/>
+                <${EndDate}/>
+            </>
+        `
+    }
+
+    console.log(MyToolbar())
+</script>
+</body>
+</html>
