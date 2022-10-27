@@ -1,4 +1,4 @@
-/* Extml, version: 1.0.0 - October 27, 2022 17:26:25 */
+/* Extml, version: 1.0.1 - October 27, 2022 17:27:01 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
