@@ -2,7 +2,8 @@
   "name": "extml",
   "version": "1.0.1",
   "description": "Converts html tagged templates to ExtJS component object",
-  "main": "index.js",
+  "main": "dist/extml.es.js",
+  "module": "index.js",
   "type": "module",
   "scripts": {
     "preversion": "npm run-script test",
