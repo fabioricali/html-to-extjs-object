@@ -119,5 +119,5 @@ function h(type, props, ...children) {
     return createComponentConfig(type, props, children);
 }
 //console.dir(htm)
-const extml = htm.bind(h);
-export default extml;
+export const extml = htm.bind(h);
+//export default extml;

@@ -8,7 +8,7 @@ $ npm install -D extml
 
 ## Example
 ```js
-import extml from 'extml';
+import {extml} from 'extml';
 
 function onPaintedHandle() {
     return 'foo';

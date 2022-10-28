@@ -1,4 +1,4 @@
-import extml, {createStyle, destroyStyle} from "../index.js";
+import {extml, createStyle, destroyStyle} from "../index.js";
 import assert from 'node:assert';
 
 let defaultListeners = [
