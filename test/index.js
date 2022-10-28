@@ -152,4 +152,21 @@ describe('converts html to extjs object', function () {
         assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
     });
 
+    it('#8, scoped style', function () {
+        let myHtml = `<div>sss</div>`
+        let result = h`
+            <style> 
+                :component {
+                    border: 1px solid red;
+                }
+            </style>
+            <toolbar>
+                ${myHtml}
+            </toolbar>
+        `;
+        //console.log(result)
+        assert.notEqual(result.stylesheet, undefined)
+        //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+    });
+
 })

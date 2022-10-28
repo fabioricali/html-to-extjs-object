@@ -1,4 +1,5 @@
 import htm from 'htm'
+
 const STYLE_PREFIX = 'extml-style-'
 
 
@@ -115,10 +116,22 @@ function createComponentConfig(type, props, children, propsFunction) {
 }
 
 function _h(type, props, ...children) {
-    if (typeof type === 'function') {
+    if (type === 'style') {
+        return {isStyle: true, content: children[0] || ''}
+    } else if (typeof type === 'function') {
         return createComponentConfig(type.name, type(props), children, props)
     }
     return createComponentConfig(type, props, children);
 }
+
 //console.dir(htm)
-export const h = htm.bind(_h);
+export const h = function (strings, ...values) {
+    let parsed = htm.bind(_h)(strings, ...values);
+    //get style by component definition
+    if (parsed.length > 1 && parsed[0].isStyle) {
+        let styleContent = parsed[0].content;
+        parsed = parsed[1];
+        parsed.stylesheet = styleContent;
+    }
+    return parsed
+}

@@ -29,8 +29,8 @@ console.log(result)
 }
  */
 
-//Stylesheet 
-let stylesheet = `
+//Define a scoped style for the component and his children
+let result = h`
     <style>
         :component {
             border: 4px solid red;
@@ -42,11 +42,7 @@ let stylesheet = `
             text-align: center;
         }
     </style>
-`;
-
-//stylesheet property defines a scoped style for the component and his children
-let result = h`
-    <segmentedbutton stylesheet="${stylesheet}" allowMultiple="${true}" onpainted="${onPaintedHandle}">
+    <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}">
         <.../>
     </segmentedbutton>
 `;
