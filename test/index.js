@@ -1,4 +1,4 @@
-import {extml, createStyle, destroyStyle} from "../index.js";
+import {h, createStyle, destroyStyle} from "../index.js";
 import assert from 'node:assert';
 
 let defaultListeners = [
@@ -12,7 +12,7 @@ let defaultListeners = [
 
 describe('converts html to extjs object', function () {
     it('#1, simple component', function () {
-        let result = extml`
+        let result = h`
             <segmentedbutton/>
         `;
         //console.log(result)
@@ -21,11 +21,11 @@ describe('converts html to extjs object', function () {
 
     it('#2, simple component returned by a function', function () {
         function MyComponent() {
-            return extml`
+            return h`
                 <toolbar/>
             `
         }
-        let result = extml`
+        let result = h`
             <${MyComponent}/>
         `;
         //console.log(result)
@@ -34,18 +34,18 @@ describe('converts html to extjs object', function () {
 
     it('#3, nested components v1', function () {
         function Child() {
-            return extml`
+            return h`
                 <button value="click me"/>
             `
         }
         function Mother() {
-            return extml`
+            return h`
                 <toolbar>
                     <${Child}/>
                 </toolbar>
             `
         }
-        let result = extml`
+        let result = h`
             <${Mother}/>
         `;
         //console.log(result)
@@ -67,16 +67,16 @@ describe('converts html to extjs object', function () {
 
     it('#4, nested components v2', function () {
         function Child() {
-            return extml`
+            return h`
                 <button value="click me"/>
             `
         }
         function Mother() {
-            return extml`
+            return h`
                 <toolbar/>
             `
         }
-        let result = extml`
+        let result = h`
             <${Mother}>
                 <${Child}/>
             </>
@@ -103,7 +103,7 @@ describe('converts html to extjs object', function () {
             return true;
         }
 
-        let result = extml`
+        let result = h`
             <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}"/>
         `;
         //console.log(result)
@@ -123,12 +123,12 @@ describe('converts html to extjs object', function () {
 
         function MyComponent(props) {
             //console.log('--->', props)
-            return extml`
+            return h`
                 <toolbar docked="left" onpainted="${onPaintedHandle2}"/>
             `
         }
 
-        let result = extml`
+        let result = h`
             <${MyComponent} docked="right" hidePanelStats="${true}" onpainted="${onPaintedHandle1}"/>
         `;
         //console.log(result)
@@ -137,7 +137,7 @@ describe('converts html to extjs object', function () {
         assert.equal(result.docked, 'right')
         assert.equal(result.hidePanelStats, true)
 
-        let result2 = extml`
+        let result2 = h`
             <${MyComponent} onpainted="${onPaintedHandle1}"/>
         `;
         //console.log(result2)
@@ -149,7 +149,7 @@ describe('converts html to extjs object', function () {
 
     it('#7, html nested', function () {
         let myHtml = `<div>sss</div>`
-        let result = extml`
+        let result = h`
             <toolbar>
                 ${myHtml}
             </toolbar>

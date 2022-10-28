@@ -8,12 +8,12 @@ $ npm install -D extml
 
 ## Example
 ```js
-import {extml} from 'extml';
+import {h} from 'extml';
 
 function onPaintedHandle() {
     return 'foo';
 }
-let result = extml`
+let result = h`
     <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}">
         <.../>
     </segmentedbutton>
@@ -46,7 +46,7 @@ let stylesheet = `
 `;
 
 //stylesheet property defines a scoped style for the component and his children
-let result = extml`
+let result = h`
     <segmentedbutton stylesheet="${stylesheet}" allowMultiple="${true}" onpainted="${onPaintedHandle}">
         <.../>
     </segmentedbutton>

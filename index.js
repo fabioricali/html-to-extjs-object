@@ -112,12 +112,11 @@ function createComponentConfig(type, props, children, propsFunction) {
     return componentConfig
 }
 
-function h(type, props, ...children) {
+function _h(type, props, ...children) {
     if (typeof type === 'function') {
         return createComponentConfig(type.name, type(props), children, props)
     }
     return createComponentConfig(type, props, children);
 }
 //console.dir(htm)
-export const extml = htm.bind(h);
-//export default extml;
+export const h = htm.bind(_h);

@@ -6,47 +6,47 @@
 </head>
 <body>
 <script type="module">
-    import {extml} from '../dist/extml.es.js'
+    import {h} from '../dist/extml.es.js'
 
     export function StartDate(props) {
         //console.log(props)
         //language=html
-        return extml`
+        return h`
             <datefield value="${new Date()}"/>
         `
     }
 
     export function EndDate() {
         //language=html
-        return extml`
+        return h`
             <datefield value="${new Date()}"/>
         `
     }
 
     export function RetrieveButton() {
         //language=html
-        return extml`
+        return h`
             <button ui="action" value="Click me"/>
         `
     }
 
     export function ContainerFoo() {
         //language=html
-        return extml`
+        return h`
             <container oninitialize="${() => {}}"/>
         `
     }
 
     export function StatsLabel() {
         //language=html
-        return extml`
+        return h`
             <label html="Stats"/>
         `
     }
 
     export function MyToolbar() {
         //language=html
-        return extml`
+        return h`
             <toolbar docked="right" style="background: #fff" onpainted="${() => {}}">
                 <${StartDate} option="${123}"/>
                 <${EndDate}/>

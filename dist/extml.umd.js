@@ -1,4 +1,4 @@
-/* Extml, version: 1.1.1 - October 28, 2022 10:34:38 */
+/* Extml, version: 1.1.1 - October 28, 2022 10:40:05 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -120,23 +120,22 @@
         return componentConfig
     }
 
-    function h(type, props, ...children) {
+    function _h(type, props, ...children) {
         if (typeof type === 'function') {
             return createComponentConfig(type.name, type(props), children, props)
         }
         return createComponentConfig(type, props, children);
     }
     //console.dir(htm)
-    const extml = htm.bind(h);
-    //export default extml;
+    const h = htm.bind(_h);
 
     exports.addEvent = addEvent;
     exports.composeStyleInner = composeStyleInner;
     exports.createEventObject = createEventObject;
     exports.createStyle = createStyle;
     exports.destroyStyle = destroyStyle;
-    exports.extml = extml;
     exports.extractListenerName = extractListenerName;
+    exports.h = h;
     exports.isListener = isListener;
 
 }));
