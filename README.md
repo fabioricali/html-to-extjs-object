@@ -29,6 +29,28 @@ console.log(result)
   allowMultiple: true
 }
  */
+
+//Stylesheet 
+let stylesheet = `
+    <style>
+        :component {
+            border: 4px solid red;
+        }
+        .x-input-el {
+            margin: auto;
+        }
+        .x-label-el {
+            text-align: center;
+        }
+    </style>
+`;
+
+//stylesheet property defines a scoped style for the component and his children
+let result = extml`
+    <segmentedbutton stylesheet="${stylesheet}" allowMultiple="${true}" onpainted="${onPaintedHandle}">
+        <.../>
+    </segmentedbutton>
+`;
 ```
 ## License
 Extml is open-sourced software licensed under the <a target="_blank" href="http://opensource.org/licenses/MIT">MIT license</a>
