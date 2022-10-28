@@ -25,7 +25,6 @@ console.log(result)
   xtype: 'segmentedbutton',
   items: [...],
   listeners: [ { painted: [Function: onPaintedHandle] } ],
-  html: '',
   allowMultiple: true
 }
  */

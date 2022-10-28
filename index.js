@@ -80,12 +80,10 @@ export function addEvent(componentConfig, eventObject) {
 function createComponentConfig(type, props, children, propsFunction) {
     let componentConfig = {
         xtype: type.toLowerCase(),
-        items: [],
         listeners: [
             createEventObject('initialize', createStyle),
             createEventObject('destroy', destroyStyle)
-        ],
-        html: ''
+        ]
     };
 
     props = Object.assign({}, props, propsFunction);
@@ -103,8 +101,12 @@ function createComponentConfig(type, props, children, propsFunction) {
 
     children.forEach(child => {
         if (typeof child === 'string') {
+            if (!componentConfig.html)
+                componentConfig.html = '';
             componentConfig.html += child
         } else {
+            if (!componentConfig.items)
+                componentConfig.items = [];
             componentConfig.items.push(child)
         }
     })

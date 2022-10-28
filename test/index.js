@@ -16,7 +16,7 @@ describe('converts html to extjs object', function () {
             <segmentedbutton/>
         `;
         //console.log(result)
-        assert.deepEqual(result, {xtype: 'segmentedbutton', items: [], listeners: Object.assign([], defaultListeners), html: ''});
+        assert.deepEqual(result, {xtype: 'segmentedbutton', listeners: Object.assign([], defaultListeners)});
     });
 
     it('#2, simple component returned by a function', function () {
@@ -29,7 +29,7 @@ describe('converts html to extjs object', function () {
             <${MyComponent}/>
         `;
         //console.log(result)
-        assert.deepEqual(result, {xtype: 'toolbar', items: [], listeners: Object.assign([], defaultListeners), html: ''});
+        assert.deepEqual(result, {xtype: 'toolbar', listeners: Object.assign([], defaultListeners)});
     });
 
     it('#3, nested components v1', function () {
@@ -54,14 +54,11 @@ describe('converts html to extjs object', function () {
             items: [
                 {
                     xtype: 'button',
-                    items: [],
                     listeners: defaultListeners,
-                    html: '',
                     value: 'click me'
                 }
             ],
-            listeners: defaultListeners,
-            html: ''
+            listeners: defaultListeners
         });
     });
 
@@ -87,14 +84,11 @@ describe('converts html to extjs object', function () {
             items: [
                 {
                     xtype: 'button',
-                    items: [],
                     listeners: defaultListeners,
-                    html: '',
                     value: 'click me'
                 }
             ],
-            listeners: defaultListeners,
-            html: ''
+            listeners: defaultListeners
         });
     });
 
@@ -155,7 +149,7 @@ describe('converts html to extjs object', function () {
             </toolbar>
         `;
         //console.log(result)
-        assert.deepEqual(result, { xtype: 'toolbar', items: [], listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+        assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
     });
 
 })
