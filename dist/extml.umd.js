@@ -1,4 +1,4 @@
-/* Extml, version: 1.1.2 - October 28, 2022 10:40:58 */
+/* Extml, version: 1.1.3 - October 28, 2022 12:39:17 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -88,12 +88,10 @@
     function createComponentConfig(type, props, children, propsFunction) {
         let componentConfig = {
             xtype: type.toLowerCase(),
-            items: [],
             listeners: [
                 createEventObject('initialize', createStyle),
                 createEventObject('destroy', destroyStyle)
-            ],
-            html: ''
+            ]
         };
 
         props = Object.assign({}, props, propsFunction);
@@ -111,8 +109,12 @@
 
         children.forEach(child => {
             if (typeof child === 'string') {
+                if (!componentConfig.html)
+                    componentConfig.html = '';
                 componentConfig.html += child;
             } else {
+                if (!componentConfig.items)
+                    componentConfig.items = [];
                 componentConfig.items.push(child);
             }
         });
