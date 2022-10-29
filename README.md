@@ -14,7 +14,7 @@ function onPaintedHandle() {
     return 'foo';
 }
 let result = h`
-    <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}">
+    <segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
         <.../>
     </segmentedbutton>
 `;
@@ -42,7 +42,7 @@ let result = h`
             text-align: center;
         }
     </style>
-    <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}">
+    <segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
         <.../>
     </segmentedbutton>
 `;
