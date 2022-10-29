@@ -1,4 +1,5 @@
-import {h, createStyle, destroyStyle} from "../index.js";
+import {h} from "../src/index.js";
+import {createStyle, destroyStyle} from "../src/style.js";
 import assert from 'node:assert';
 
 let defaultListeners = [

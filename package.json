@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "description": "Converts html tagged templates to ExtJS component object",
   "main": "dist/extml.es.js",
-  "module": "index.js",
+  "module": "src/index.js",
   "type": "module",
   "scripts": {
     "preversion": "npm run-script test",
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/fabioricali/html-to-extjs-object#readme",
   "devDependencies": {
+    "@el3um4s/rollup-plugin-terser": "^1.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "htm": "^3.1.1",
     "mocha": "^10.1.0",

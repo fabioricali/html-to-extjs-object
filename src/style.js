@@ -1,15 +1,4 @@
-import htm from 'htm'
-
-const STYLE_PREFIX = 'extml-style-'
-
-
-export function isListener(prop) {
-    return prop.startsWith('on')
-}
-
-export function extractListenerName(prop) {
-    return prop.substring(2)
-}
+const STYLE_PREFIX = 'extml-style-';
 
 export function composeStyleInner(cssContent, tag) {
     if (typeof cssContent !== 'string')
@@ -66,72 +55,4 @@ export function createStyle() {
 export function destroyStyle() {
     if (!this.stylesheet) return;
     document.getElementById(STYLE_PREFIX + this.getId()).remove();
-}
-
-export function createEventObject(name, handle) {
-    let event = {}
-    event[name] = handle;
-    return event;
-}
-
-export function addEvent(componentConfig, eventObject) {
-    componentConfig.listeners.push(eventObject);
-}
-
-function createComponentConfig(type, props, children, propsFunction) {
-    let componentConfig = {
-        xtype: type.toLowerCase(),
-        listeners: [
-            createEventObject('initialize', createStyle),
-            createEventObject('destroy', destroyStyle)
-        ]
-    };
-
-    props = Object.assign({}, props, propsFunction);
-
-    for (let prop in props) {
-        if (isListener(prop)) {
-            addEvent(
-                componentConfig,
-                createEventObject(extractListenerName(prop), props[prop])
-            )
-        } else {
-            componentConfig[prop] = props[prop];
-        }
-    }
-
-    children.forEach(child => {
-        if (typeof child === 'string') {
-            if (!componentConfig.html)
-                componentConfig.html = '';
-            componentConfig.html += child
-        } else {
-            if (!componentConfig.items)
-                componentConfig.items = [];
-            componentConfig.items.push(child)
-        }
-    })
-
-    return componentConfig
-}
-
-function _h(type, props, ...children) {
-    if (type === 'style') {
-        return {isStyle: true, content: children[0] || ''}
-    } else if (typeof type === 'function') {
-        return createComponentConfig(type.name, type(props), children, props)
-    }
-    return createComponentConfig(type, props, children);
-}
-
-//console.dir(htm)
-export const h = function (strings, ...values) {
-    let parsed = htm.bind(_h)(strings, ...values);
-    //get style by component definition
-    if (parsed.length > 1 && parsed[0].isStyle) {
-        let styleContent = parsed[0].content;
-        parsed = parsed[1];
-        parsed.stylesheet = styleContent;
-    }
-    return parsed
 }
