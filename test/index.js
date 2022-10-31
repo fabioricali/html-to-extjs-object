@@ -1,13 +1,12 @@
-import {h} from "../src/index.js";
-import {createStyle, destroyStyle} from "../src/style.js";
+import {h, initialize, destroy} from "../src/index.js";
 import assert from 'node:assert';
 
 let defaultListeners = [
     {
-        initialize: createStyle
+        initialize
     },
     {
-        destroy: destroyStyle
+        destroy
     }
 ]
 
@@ -167,6 +166,22 @@ describe('converts html to extjs object', function () {
         `;
         //console.log(result)
         assert.notEqual(result.stylesheet, undefined)
+        //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+    });
+
+    it('#9, context', function () {
+        let result = h`
+            <style> 
+                :component {
+                    border: 1px solid red;
+                }
+            </style>
+            <context name="myContext">
+                <toolbar/>
+            </context>
+        `;
+        console.log(result)
+        //assert.notEqual(result.stylesheet, undefined)
         //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
     });
 

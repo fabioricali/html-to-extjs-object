@@ -1,13 +1,23 @@
 import htm from 'htm'
 import {createStyle, destroyStyle} from './style.js';
+import {createContext} from "./context.js";
 import {isEvent, addEvent, extractListenerName, createEventObject} from './event.js';
+
+export function initialize() {
+    createStyle.apply(this);
+    createContext.apply(this);
+}
+
+export function destroy() {
+    destroyStyle.apply(this)
+}
 
 function createComponentConfig(type, props, children, propsFunction) {
     let componentConfig = {
         xtype: type.toLowerCase(),
         listeners: [
-            createEventObject('initialize', createStyle),
-            createEventObject('destroy', destroyStyle)
+            createEventObject('initialize', initialize),
+            createEventObject('destroy', destroy)
         ]
     };
 
@@ -42,6 +52,8 @@ function createComponentConfig(type, props, children, propsFunction) {
 function _h(type, props, ...children) {
     if (type === 'style') {
         return {isStyle: true, content: children[0] || ''}
+    } else if (type === 'context') {
+        return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
         return createComponentConfig(type.name, type(props), children, props)
     }
@@ -56,5 +68,12 @@ export function h(strings, ...values) {
         parsed = parsed[1];
         parsed.stylesheet = styleContent;
     }
+
+    if (parsed.isContext) {
+        let contextName = parsed.props.name;
+        parsed = parsed.children;
+        parsed.contextName = contextName;
+    }
+
     return parsed
 }

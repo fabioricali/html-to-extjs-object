@@ -13,6 +13,7 @@ import {h} from 'extml';
 function onPaintedHandle() {
     return 'foo';
 }
+
 let result = h`
     <segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
         <.../>
