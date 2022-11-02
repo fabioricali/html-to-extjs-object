@@ -7,7 +7,7 @@ export function createContext() {
         controller.context = this.context;
     }
     if (this.contextName) {
-        this.context[this.contextName] = this.context[this.contextName] || {};
+        this.context[this.contextName] = /*this.context[this.contextName] ||*/ {};
         this.context[this.contextName][this.getItemId()] = this;
         this.query('*').forEach(item => {
             this.context[this.contextName][item.getItemId()] = item;
