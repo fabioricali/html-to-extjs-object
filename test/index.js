@@ -180,9 +180,64 @@ describe('converts html to extjs object', function () {
                 <toolbar/>
             </context>
         `;
-        console.log(result)
-        //assert.notEqual(result.stylesheet, undefined)
+        //console.log(result)
+        assert.notEqual(result.contextName, undefined)
         //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
     });
+
+    it('#10, grid', function () {
+        let result = h`
+            <grid>
+                <booleancolumn/>
+                <textcolumn/>
+                <booleancolumn/>
+                <checkcolumn/>
+                <datecolumn/>
+                <numbercolumn/>
+                <rownumberer/>
+                <textcolumn/>
+                <treecolumn/>
+            </grid>
+        `;
+        //console.log(result)
+        assert.notEqual(result.columns, undefined)
+        assert.equal(result.columns[0].xtype, 'booleancolumn')
+        assert.equal(result.columns[8].xtype, 'treecolumn')
+        //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+    });
+
+    it('#11, controller by object', function () {
+        let myController = {
+            control: {
+                '#mySelector': {
+                    tap() {}
+                }
+            }
+        }
+
+        let result = h`
+            <toolbar controller="${myController}"/>
+        `;
+        //console.log(result)
+        assert.notEqual(result.controller.control, undefined)
+    })
+
+    it('#11, controller by function', function () {
+        let myController = function () {
+            return {
+                control: {
+                    '#mySelector': {
+                        tap() {}
+                    }
+                }
+            }
+        }
+
+        let result = h`
+            <toolbar controller="${myController}"/>
+        `;
+        //console.log(result)
+        assert.notEqual(result.controller.control, undefined)
+    })
 
 })

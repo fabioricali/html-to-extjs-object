@@ -29,6 +29,8 @@ function createComponentConfig(type, props, children, propsFunction) {
                 componentConfig,
                 createEventObject(extractListenerName(prop), props[prop])
             )
+        } else if (prop === 'controller' && typeof props[prop] === 'function') {
+            componentConfig[prop] = props[prop]();
         } else {
             componentConfig[prop] = props[prop];
         }
@@ -39,6 +41,21 @@ function createComponentConfig(type, props, children, propsFunction) {
             if (!componentConfig.html)
                 componentConfig.html = '';
             componentConfig.html += child
+        } else if (child.xtype && [
+            'gridcolumn',
+            'column',
+            'templatecolumn',
+            'booleancolumn',
+            'checkcolumn',
+            'datecolumn',
+            'numbercolumn',
+            'rownumberer',
+            'textcolumn',
+            'treecolumn'
+        ].includes(child.xtype)) {
+            if (!componentConfig.columns)
+                componentConfig.columns = [];
+            componentConfig.columns.push(child)
         } else {
             if (!componentConfig.items)
                 componentConfig.items = [];
