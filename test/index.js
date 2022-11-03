@@ -240,4 +240,19 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.controller.control, undefined)
     })
 
+    it('#12, menu inside a button', function () {
+
+        //language=html
+        let result = h`
+            <button text="Export foo"> 
+               <menu>
+                   <button text="button 1"/>
+                   <button text="button 2"/>
+               </menu>
+            </button>
+        `;
+        //console.log(result)
+        assert.notEqual(result.menu, undefined)
+    })
+
 })
