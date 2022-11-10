@@ -270,4 +270,22 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.menu, undefined)
     })
 
+    it('#9, context', function () {
+        function createContext() {}
+        let result = h`
+            <style> 
+                :component {
+                    border: 1px solid red;
+                }
+            </style>
+            <toolbar context="toolbar">
+                <button itemid="button1" text="button1"/>
+                <button itemid="button2" text="button2"/>
+            </toolbar>
+        `;
+        console.log(result)
+        //assert.notEqual(result.stylesheet, undefined)
+        //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+    });
+
 })

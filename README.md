@@ -48,6 +48,10 @@ let result = h`
     </ext-segmentedbutton>
 `;
 ```
+
+## DEMO
+<a target="_blank" href="https://fiddle.sencha.com/#view/editor&fiddle/3lv6">LIVE HERE</a>
+
 ## License
 Extml is open-sourced software licensed under the <a target="_blank" href="http://opensource.org/licenses/MIT">MIT license</a>
 
