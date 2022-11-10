@@ -15,9 +15,9 @@ function onPaintedHandle() {
 }
 
 let result = h`
-    <segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
+    <ext-segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
         <.../>
-    </segmentedbutton>
+    </ext-segmentedbutton>
 `;
 // the "segmentedbutton" tag is referred to Extjs xtype property
 console.log(result)
@@ -43,9 +43,9 @@ let result = h`
             text-align: center;
         }
     </style>
-    <segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
+    <ext-segmentedbutton allowMultiple=${true} onpainted=${onPaintedHandle}>
         <.../>
-    </segmentedbutton>
+    </ext-segmentedbutton>
 `;
 ```
 ## License

@@ -2,6 +2,9 @@ import htm from 'htm'
 import {createStyle, destroyStyle} from './style.js';
 import {createContext} from "./context.js";
 import {isEvent, addEvent, extractListenerName, createEventObject} from './event.js';
+import {generateHtmlClass} from "./generateHtmlClass.js";
+
+export {generateHtmlClass};
 
 export function initialize() {
     createStyle.apply(this);
@@ -13,6 +16,8 @@ export function destroy() {
 }
 
 function createComponentConfig(type, props, children, propsFunction) {
+
+    // default configuration
     let componentConfig = {
         xtype: type.toLowerCase(),
         listeners: [
@@ -21,26 +26,32 @@ function createComponentConfig(type, props, children, propsFunction) {
         ]
     };
 
-    props = Object.assign({}, props, propsFunction);
+    let configFromProps = Object.assign({}, props, propsFunction);
+    let isHtmlType = (configFromProps.xtype || type).startsWith('html-')
 
-    for (let prop in props) {
-        if (isEvent(prop)) {
-            addEvent(
-                componentConfig,
-                createEventObject(extractListenerName(prop), props[prop])
-            )
-        } else if (prop === 'controller' && typeof props[prop] === 'function') {
-            componentConfig[prop] = props[prop]();
-        } else {
-            componentConfig[prop] = props[prop];
+    if (isHtmlType) {
+        componentConfig._propsAttributes = props;
+    } else {
+        for (let prop in configFromProps) {
+            if (isEvent(prop) && !isHtmlType) {
+                addEvent(
+                    componentConfig,
+                    createEventObject(extractListenerName(prop), configFromProps[prop])
+                );
+            } else if (prop === 'controller' && typeof configFromProps[prop] === 'function') {
+                componentConfig[prop] = configFromProps[prop]();
+            } else {
+                componentConfig[prop] = configFromProps[prop];
+            }
         }
     }
 
     children.forEach(child => {
+        //console.log(child.xtype)
         if (typeof child === 'string') {
             if (!componentConfig.html)
                 componentConfig.html = '';
-            componentConfig.html += child
+            componentConfig.html += child;
         } else if (child.xtype && [
             'gridcolumn',
             'column',
@@ -55,7 +66,7 @@ function createComponentConfig(type, props, children, propsFunction) {
         ].includes(child.xtype)) {
             if (!componentConfig.columns)
                 componentConfig.columns = [];
-            componentConfig.columns.push(child)
+            componentConfig.columns.push(child);
         } else if (child.xtype && [
             'menu'
         ].includes(child.xtype) && [
@@ -66,11 +77,20 @@ function createComponentConfig(type, props, children, propsFunction) {
         } else {
             if (!componentConfig.items)
                 componentConfig.items = [];
-            componentConfig.items.push(child)
+            componentConfig.items.push(child);
         }
-    })
+    });
 
     return componentConfig
+}
+
+function detectClassType(xtype) {
+    if (xtype.startsWith('ext-')) {
+        xtype = xtype.split('ext-')[1];
+    } else {
+        xtype = 'html-' + xtype;
+    }
+    return xtype;
 }
 
 function _h(type, props, ...children) {
@@ -79,9 +99,9 @@ function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        return createComponentConfig(type.name, type(props), children, props)
+        return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
-    return createComponentConfig(type, props, children);
+    return createComponentConfig(detectClassType(type), props, children);
 }
 
 export function h(strings, ...values) {
@@ -101,3 +121,9 @@ export function h(strings, ...values) {
 
     return parsed
 }
+
+try {
+    if (window) {
+        generateHtmlClass()
+    }
+} catch (e) {}

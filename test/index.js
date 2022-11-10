@@ -1,5 +1,18 @@
-import {h, initialize, destroy} from "../src/index.js";
+import { GlobalRegistrator } from '@happy-dom/global-registrator';
+GlobalRegistrator.register();
+import {h, initialize, destroy, generateHtmlClass} from "../src/index.js";
 import assert from 'node:assert';
+
+window.Ext = {
+    define(className, config) {
+        return config
+    },
+    create(className, config) {
+        return config
+    }
+}
+
+generateHtmlClass()
 
 let defaultListeners = [
     {
@@ -10,10 +23,12 @@ let defaultListeners = [
     }
 ]
 
+generateHtmlClass()
+
 describe('converts html to extjs object', function () {
     it('#1, simple component', function () {
         let result = h`
-            <segmentedbutton/>
+            <ext-segmentedbutton/>
         `;
         //console.log(result)
         assert.deepEqual(result, {xtype: 'segmentedbutton', listeners: Object.assign([], defaultListeners)});
@@ -22,7 +37,7 @@ describe('converts html to extjs object', function () {
     it('#2, simple component returned by a function', function () {
         function MyComponent() {
             return h`
-                <toolbar/>
+                <ext-toolbar/>
             `
         }
         let result = h`
@@ -35,14 +50,14 @@ describe('converts html to extjs object', function () {
     it('#3, nested components v1', function () {
         function Child() {
             return h`
-                <button value="click me"/>
+                <ext-button value="click me"/>
             `
         }
         function Mother() {
             return h`
-                <toolbar>
+                <ext-toolbar>
                     <${Child}/>
-                </toolbar>
+                </ext-toolbar>
             `
         }
         let result = h`
@@ -65,12 +80,12 @@ describe('converts html to extjs object', function () {
     it('#4, nested components v2', function () {
         function Child() {
             return h`
-                <button value="click me"/>
+                <ext-button value="click me"/>
             `
         }
         function Mother() {
             return h`
-                <toolbar/>
+                <ext-toolbar/>
             `
         }
         let result = h`
@@ -98,7 +113,7 @@ describe('converts html to extjs object', function () {
         }
 
         let result = h`
-            <segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}"/>
+            <ext-segmentedbutton allowMultiple="${true}" onpainted="${onPaintedHandle}"/>
         `;
         //console.log(result)
         assert.equal(result.listeners[2].painted, onPaintedHandle)
@@ -118,7 +133,7 @@ describe('converts html to extjs object', function () {
         function MyComponent(props) {
             //console.log('--->', props)
             return h`
-                <toolbar docked="left" onpainted="${onPaintedHandle2}"/>
+                <ext-toolbar docked="left" onpainted="${onPaintedHandle2}"/>
             `
         }
 
@@ -144,9 +159,9 @@ describe('converts html to extjs object', function () {
     it('#7, html nested', function () {
         let myHtml = `<div>sss</div>`
         let result = h`
-            <toolbar>
+            <ext-toolbar>
                 ${myHtml}
-            </toolbar>
+            </ext-toolbar>
         `;
         //console.log(result)
         assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
@@ -160,9 +175,9 @@ describe('converts html to extjs object', function () {
                     border: 1px solid red;
                 }
             </style>
-            <toolbar>
+            <ext-toolbar>
                 ${myHtml}
-            </toolbar>
+            </ext-toolbar>
         `;
         //console.log(result)
         assert.notEqual(result.stylesheet, undefined)
@@ -177,7 +192,7 @@ describe('converts html to extjs object', function () {
                 }
             </style>
             <context name="myContext">
-                <toolbar/>
+                <ext-toolbar/>
             </context>
         `;
         //console.log(result)
@@ -187,17 +202,17 @@ describe('converts html to extjs object', function () {
 
     it('#10, grid', function () {
         let result = h`
-            <grid>
-                <booleancolumn/>
-                <textcolumn/>
-                <booleancolumn/>
-                <checkcolumn/>
-                <datecolumn/>
-                <numbercolumn/>
-                <rownumberer/>
-                <textcolumn/>
-                <treecolumn/>
-            </grid>
+            <ext-grid>
+                <ext-booleancolumn/>
+                <ext-textcolumn/>
+                <ext-booleancolumn/>
+                <ext-checkcolumn/>
+                <ext-datecolumn/>
+                <ext-numbercolumn/>
+                <ext-rownumberer/>
+                <ext-textcolumn/>
+                <ext-treecolumn/>
+            </ext-grid>
         `;
         //console.log(result)
         assert.notEqual(result.columns, undefined)
@@ -216,7 +231,7 @@ describe('converts html to extjs object', function () {
         }
 
         let result = h`
-            <toolbar controller="${myController}"/>
+            <ext-toolbar controller="${myController}"/>
         `;
         //console.log(result)
         assert.notEqual(result.controller.control, undefined)
@@ -234,7 +249,7 @@ describe('converts html to extjs object', function () {
         }
 
         let result = h`
-            <toolbar controller="${myController}"/>
+            <ext-toolbar controller="${myController}"/>
         `;
         //console.log(result)
         assert.notEqual(result.controller.control, undefined)
@@ -244,12 +259,12 @@ describe('converts html to extjs object', function () {
 
         //language=html
         let result = h`
-            <button text="Export foo"> 
-               <menu>
-                   <button text="button 1"/>
-                   <button text="button 2"/>
-               </menu>
-            </button>
+            <ext-button text="Export foo"> 
+               <ext-menu>
+                   <ext-button text="button 1"/>
+                   <ext-button text="button 2"/>
+               </ext-menu>
+            </ext-button>
         `;
         //console.log(result)
         assert.notEqual(result.menu, undefined)
