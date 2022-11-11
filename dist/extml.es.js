@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.0 - November 11, 2022 09:59:15 */
+/* Extml, version: 2.1.1 - November 11, 2022 11:06:52 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -276,13 +276,15 @@ function h(strings, ...values) {
         parsed = parsed[1];
         parsed.stylesheet = styleContent;
     }
-
+    //get context
     if (parsed.isContext) {
         let contextName = parsed.props.name;
+        //get possible stylesheet obtained from the upper block
+        let stylesheet = parsed.stylesheet;
         parsed = parsed.children;
+        parsed.stylesheet = stylesheet;
         parsed.contextName = contextName;
     }
-
     return parsed
 }try {
     if (window) {
