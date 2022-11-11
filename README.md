@@ -1,10 +1,13 @@
 # extml
-Converts html tagged templates to ExtJS component object
+Converts html tagged templates to ExtJS component object.
 
 ## Get started
 ```
 $ npm install -D extml
 ```
+
+## Demo
+<a target="_blank" href="https://fiddle.sencha.com/#view/editor&fiddle/3lv6">LIVE HERE</a>
 
 ## Example
 ```js
@@ -49,8 +52,11 @@ let result = h`
 `;
 ```
 
-## DEMO
-<a target="_blank" href="https://fiddle.sencha.com/#view/editor&fiddle/3lv6">LIVE HERE</a>
+## Things to know
+- You can ***write html*** code together with ***Ext JS components***.
+- All component tag must be defined with prefix ***"ext-"*** so it is possible to distinguish them from native html tags. 
+- The component listeners must be defined with prefix ***"on"***, for example "tap" becomes ***"ontap"***.
+- You can define a ***scoped style*** on top of each component.
 
 ## License
 Extml is open-sourced software licensed under the <a target="_blank" href="http://opensource.org/licenses/MIT">MIT license</a>

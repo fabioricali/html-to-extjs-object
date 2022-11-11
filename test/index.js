@@ -270,7 +270,7 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.menu, undefined)
     })
 
-    it('#9, context', function () {
+    it('#13, class property instead cls', function () {
         function createContext() {}
         let result = h`
             <style> 
@@ -278,14 +278,12 @@ describe('converts html to extjs object', function () {
                     border: 1px solid red;
                 }
             </style>
-            <toolbar context="toolbar">
-                <button itemid="button1" text="button1"/>
-                <button itemid="button2" text="button2"/>
-            </toolbar>
+            <ext-toolbar class="my-toolbar">
+                <ext-button itemId="button1" text="button1"/>
+                <ext-button itemId="button2" text="button2"/>
+            </ext-toolbar>
         `;
-        console.log(result)
-        //assert.notEqual(result.stylesheet, undefined)
-        //assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+        //console.log(result)
+        assert.equal(result.cls, 'my-toolbar')
     });
-
 })
