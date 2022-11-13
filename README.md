@@ -53,6 +53,7 @@ let result = h`
 ```
 
 ## Things to know
+- At the moment compatible with ***modern toolkit*** only.
 - You can ***write html*** code together with ***Ext JS components***.
 - All component tag must be defined with prefix ***"ext-"*** so it is possible to distinguish them from native html tags. 
 - The component listeners must be defined with prefix ***"on"***, for example "tap" becomes ***"ontap"***.
