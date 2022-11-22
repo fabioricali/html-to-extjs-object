@@ -237,7 +237,7 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.controller.control, undefined)
     })
 
-    it('#11, controller by function', function () {
+    it('#12, controller by function', function () {
         let myController = function () {
             return {
                 control: {
@@ -255,7 +255,7 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.controller.control, undefined)
     })
 
-    it('#12, menu inside a button', function () {
+    it('#13, menu inside a button', function () {
 
         //language=html
         let result = h`
@@ -270,7 +270,7 @@ describe('converts html to extjs object', function () {
         assert.notEqual(result.menu, undefined)
     })
 
-    it('#13, class property instead cls', function () {
+    it('#14, class property instead cls', function () {
         function createContext() {}
         let result = h`
             <style> 
@@ -285,5 +285,20 @@ describe('converts html to extjs object', function () {
         `;
         //console.log(result)
         assert.equal(result.cls, 'my-toolbar')
+    });
+
+    it('#15, column with widget', function () {
+        function createContext() {}
+        let result = h`
+            <ext-grid>
+                <ext-column>
+                    <ext-widgetcell> 
+                        <ext-button></ext-button>
+                    </ext-widgetcell>
+                </ext-column>
+            </ext-grid>
+        `;
+        console.log(result)
+        //assert.equal(result.cls, 'my-toolbar')
     });
 })

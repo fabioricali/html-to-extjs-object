@@ -55,11 +55,7 @@ export function createComponentConfig(type, props, children, propsFunction) {
             if (!componentConfig.columns)
                 componentConfig.columns = [];
             componentConfig.columns.push(child);
-        } else if (child.xtype && [
-            'menu'
-        ].includes(child.xtype) && [
-            'button'
-        ].includes(type)) {
+        } else if (child.xtype && ['menu'].includes(child.xtype) && ['button'].includes(type)) {
             if (!componentConfig.menu)
                 componentConfig.menu = child;
         } else {
