@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.5 - February 15, 2023 10:21:01 */
+/* Extml, version: 2.1.6 - February 15, 2023 12:51:19 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -61,17 +61,31 @@ function destroyStyle() {
     this.context = Ext.getApplication().context;
     let controller = this.getController();
     //append context to controller
-    if (controller) {
-        controller.context = this.context;
-    }
+
+    let children = this.query ? this.query('*') : [];
     if (this.contextName) {
-        if (this.context[this.contextName] !== undefined)
-            throw new Error('A context with this name already exists: ' + this.contextName);
+        if (this.context[this.contextName] !== undefined) {
+            // throw new Error('A context with this name already exists: ' + this.contextName);
+            console.error('A context with this name already exists: ' + this.contextName, 'itemId:', this.getItemId());
+        }
         this.context[this.contextName] = /*this.context[this.contextName] ||*/ {};
         this.context[this.contextName][this.getItemId()] = this;
-        this.query('*').forEach(item => {
+        children.forEach(item => {
             this.context[this.contextName][item.getItemId()] = item;
         });
+    }
+
+    if (this.isContext) {
+        this.selfContext = {};
+        this.selfContext[this.getItemId()] = this;
+        children.forEach(item => {
+            this.selfContext[item.getItemId()] = item;
+        });
+    }
+
+    if (controller) {
+        controller.context = this.context;
+        controller.selfContext = this.selfContext;
     }
 }
 
