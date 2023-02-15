@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.7 - February 15, 2023 12:59:51 */
+/* Extml, version: 2.1.8 - February 15, 2023 15:00:22 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -300,8 +300,10 @@ function h(strings, ...values) {
         parsed = parsed[1];
         parsed.stylesheet = styleContent;
     }
+
     //get context
     if (parsed.isContext) {
+        parsed.props = parsed.props || {};
         let contextName = parsed.props.name;
         //get possible stylesheet obtained from the upper block
         let stylesheet = parsed.stylesheet;
