@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.8 - February 15, 2023 15:00:22 */
+/* Extml, version: 2.1.9 - February 15, 2023 16:50:41 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -86,6 +86,7 @@ function destroyStyle() {
     if (controller) {
         controller.context = this.context;
         controller.selfContext = this.selfContext;
+        controller.props = controller.view.props;
     }
 }
 
