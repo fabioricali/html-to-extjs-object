@@ -29,6 +29,7 @@ export function h(strings, ...values) {
         parsed = parsed.children;
         parsed.stylesheet = stylesheet;
         parsed.contextName = contextName;
+        parsed.isContext = true;
     }
     return parsed
 }
