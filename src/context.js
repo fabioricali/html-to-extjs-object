@@ -16,3 +16,10 @@ export function createContext() {
         });
     }
 }
+
+export function destroyContext() {
+    Ext.getApplication().context = Ext.getApplication().context || {};
+    if (this.contextName) {
+        delete Ext.getApplication().context[this.contextName];
+    }
+}
