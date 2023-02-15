@@ -28,6 +28,7 @@ export function createContext() {
     if (controller) {
         controller.context = this.context;
         controller.selfContext = this.selfContext;
+        controller.props = controller.view.props;
     }
 }
 
