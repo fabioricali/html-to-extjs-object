@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.3 - February 14, 2023 15:38:04 */
+/* Extml, version: 2.1.4 - February 15, 2023 10:07:42 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -65,6 +65,8 @@ function destroyStyle() {
         controller.context = this.context;
     }
     if (this.contextName) {
+        if (this.context[this.contextName] !== undefined)
+            throw new Error('A context with this name already exists: ' + this.contextName);
         this.context[this.contextName] = /*this.context[this.contextName] ||*/ {};
         this.context[this.contextName][this.getItemId()] = this;
         this.query('*').forEach(item => {
