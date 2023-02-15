@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.6 - February 15, 2023 12:51:19 */
+/* Extml, version: 2.1.7 - February 15, 2023 12:59:51 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -308,6 +308,7 @@ function h(strings, ...values) {
         parsed = parsed.children;
         parsed.stylesheet = stylesheet;
         parsed.contextName = contextName;
+        parsed.isContext = true;
     }
     return parsed
 }try {

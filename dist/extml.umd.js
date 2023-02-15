@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.6 - February 15, 2023 12:51:19 */
+/* Extml, version: 2.1.7 - February 15, 2023 12:59:51 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -308,6 +308,7 @@ function h(strings, ...values) {
         parsed = parsed.children;
         parsed.stylesheet = stylesheet;
         parsed.contextName = contextName;
+        parsed.isContext = true;
     }
     return parsed
 }try {
