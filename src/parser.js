@@ -21,8 +21,10 @@ export function h(strings, ...values) {
         parsed = parsed[1];
         parsed.stylesheet = styleContent;
     }
+
     //get context
     if (parsed.isContext) {
+        parsed.props = parsed.props || {};
         let contextName = parsed.props.name;
         //get possible stylesheet obtained from the upper block
         let stylesheet = parsed.stylesheet;
