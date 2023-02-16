@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.9 - February 15, 2023 16:50:41 */
+/* Extml, version: 2.1.10 - February 16, 2023 12:12:36 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -94,6 +94,10 @@ function destroyContext() {
     Ext.getApplication().context = Ext.getApplication().context || {};
     if (this.contextName) {
         delete Ext.getApplication().context[this.contextName];
+    }
+    let itemId = this.getItemId();
+    if (Ext.getApplication().context[itemId]) {
+        delete Ext.getApplication().context[itemId];
     }
 }function initialize() {
     createStyle.apply(this);
