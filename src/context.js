@@ -37,4 +37,8 @@ export function destroyContext() {
     if (this.contextName) {
         delete Ext.getApplication().context[this.contextName];
     }
+    let itemId = this.getItemId();
+    if (Ext.getApplication().context[itemId]) {
+        delete Ext.getApplication().context[itemId];
+    }
 }
