@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.10 - February 16, 2023 12:12:36 */
+/* Extml, version: 2.1.11 - February 23, 2023 18:09:56 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -75,7 +75,8 @@ function destroyStyle() {
         });
     }
 
-    if (this.isContext) {
+    //if (this.isContext) {
+    if (!this.selfContext) {
         this.selfContext = {};
         this.selfContext[this.getItemId()] = this;
         children.forEach(item => {

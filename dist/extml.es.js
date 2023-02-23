@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.10 - February 16, 2023 12:12:36 */
+/* Extml, version: 2.1.11 - February 23, 2023 18:09:56 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -75,7 +75,8 @@ function destroyStyle() {
         });
     }
 
-    if (this.isContext) {
+    //if (this.isContext) {
+    if (!this.selfContext) {
         this.selfContext = {};
         this.selfContext[this.getItemId()] = this;
         children.forEach(item => {
