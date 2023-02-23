@@ -17,7 +17,8 @@ export function createContext() {
         });
     }
 
-    if (this.isContext) {
+    //if (this.isContext) {
+    if (!this.selfContext) {
         this.selfContext = {};
         this.selfContext[this.getItemId()] = this;
         children.forEach(item => {
