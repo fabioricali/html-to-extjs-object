@@ -14,6 +14,7 @@ export function createContext() {
         this.context[this.contextName][this.getItemId()] = this;
         children.forEach(item => {
             this.context[this.contextName][item.getItemId()] = item;
+            item.context = this.context;
         });
     }
 
@@ -23,6 +24,7 @@ export function createContext() {
         this.selfContext[this.getItemId()] = this;
         children.forEach(item => {
             this.selfContext[item.getItemId()] = item;
+            item.selfContext = this.selfContext;
         });
     }
 
