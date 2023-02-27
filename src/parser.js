@@ -8,6 +8,10 @@ export function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
+        if (type(props).xtype && type(props).xtype.startsWith('html-')) {
+            // function Returns Html First
+            return type.apply(null);
+        }
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
