@@ -1,47 +1,47 @@
 export function createContext() {
-    Ext.getApplication().context = Ext.getApplication().context || {};
-    this.context = Ext.getApplication().context;
+    Ext.getApplication().appContext = Ext.getApplication().appContext || {};
+    this.appContext = Ext.getApplication().appContext;
     let controller = this.getController();
     //append context to controller
 
     let children = this.query ? this.query('*') : [];
     if (this.contextName) {
-        if (this.context[this.contextName] !== undefined) {
+        if (this.appContext[this.contextName] !== undefined) {
             // throw new Error('A context with this name already exists: ' + this.contextName);
             console.error('A context with this name already exists: ' + this.contextName, 'itemId:', this.getItemId());
         }
-        this.context[this.contextName] = /*this.context[this.contextName] ||*/ {};
-        this.context[this.contextName][this.getItemId()] = this;
+        this.appContext[this.contextName] = /*this.context[this.contextName] ||*/ {};
+        this.appContext[this.contextName][this.getItemId()] = this;
         children.forEach(item => {
-            this.context[this.contextName][item.getItemId()] = item;
-            item.context = this.context;
+            this.appContext[this.contextName][item.getItemId()] = item;
+            item.appContext = this.appContext;
         });
     }
 
     //if (this.isContext) {
-    if (!this.selfContext) {
-        this.selfContext = {};
-        this.selfContext[this.getItemId()] = this;
+    if (!this.context) {
+        this.context = {};
+        this.context[this.getItemId()] = this;
         children.forEach(item => {
-            this.selfContext[item.getItemId()] = item;
-            item.selfContext = this.selfContext;
+            this.context[item.getItemId()] = item;
+            item.context = this.context;
         });
     }
 
     if (controller) {
+        controller.appContext = this.appContext;
         controller.context = this.context;
-        controller.selfContext = this.selfContext;
         controller.props = controller.view.props;
     }
 }
 
 export function destroyContext() {
-    Ext.getApplication().context = Ext.getApplication().context || {};
+    Ext.getApplication().appContext = Ext.getApplication().appContext || {};
     if (this.contextName) {
-        delete Ext.getApplication().context[this.contextName];
+        delete Ext.getApplication().appContext[this.contextName];
     }
     let itemId = this.getItemId();
-    if (Ext.getApplication().context[itemId]) {
-        delete Ext.getApplication().context[itemId];
+    if (Ext.getApplication().appContext[itemId]) {
+        delete Ext.getApplication().appContext[itemId];
     }
 }
