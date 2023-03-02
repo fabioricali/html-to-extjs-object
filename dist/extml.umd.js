@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.14 - February 27, 2023 15:54:19 */
+/* Extml, version: 2.1.15 - March 2, 2023 14:25:37 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -295,10 +295,10 @@ function addEvent(componentConfig, eventObject) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        if (type(props).xtype && type(props).xtype.startsWith('html-')) {
-            // function Returns Html First
-            return type.apply(null);
-        }
+        // if (type(props).xtype && type(props).xtype.startsWith('html-')) {
+        //     // function Returns Html First
+        //     return type.apply(null);
+        // }
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
