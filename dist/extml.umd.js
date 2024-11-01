@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.15 - March 2, 2023 14:25:37 */
+/* Extml, version: 2.1.16 - November 1, 2024 21:32:29 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -213,75 +213,108 @@ function createEventObject(name, handle) {
 
 function addEvent(componentConfig, eventObject) {
     componentConfig.listeners.push(eventObject);
-}function createComponentConfig(type, props, children, propsFunction) {
+}const columnTypes = [
+    'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
+    'checkcolumn', 'datecolumn', 'numbercolumn', 'rownumberer',
+    'textcolumn', 'treecolumn'
+];
 
-    // default configuration
-    let componentConfig = {
-        xtype: type.toLowerCase(),
-        listeners: [
-            createEventObject('initialize', initialize),
-            createEventObject('destroy', destroy)
-        ]
-    };
+function createComponentConfig(type, props, children, propsFunction) {
+    // Default configuration
+    let componentConfig = initializeComponentConfig(type);
 
+    // Configuration based on props
     let configFromProps = Object.assign({}, props, propsFunction);
     let isHtmlType = (configFromProps.xtype || type).startsWith('html-');
 
     if (isHtmlType) {
         componentConfig._propsAttributes = props;
     } else {
-        for (let prop in configFromProps) {
-            if (isEvent(prop) && !isHtmlType) {
-                addEvent(
-                    componentConfig,
-                    createEventObject(extractListenerName(prop), configFromProps[prop])
-                );
-            } else if (prop === 'controller' && typeof configFromProps[prop] === 'function') {
-                componentConfig[prop] = configFromProps[prop]();
-            } else if (prop === 'class') {
-                componentConfig['cls'] = configFromProps[prop];
-            } else {
-                componentConfig[prop] = configFromProps[prop];
-            }
-        }
+        applyPropsToConfig(componentConfig, configFromProps);
     }
 
-    children.forEach(child => {
-        //console.log(child.xtype)
-        if (typeof child === 'string') {
-            if (!componentConfig.html)
-                componentConfig.html = '';
-            componentConfig.html += child;
-        } else if (child.xtype && [
-            'gridcolumn',
-            'column',
-            'templatecolumn',
-            'booleancolumn',
-            'checkcolumn',
-            'datecolumn',
-            'numbercolumn',
-            'rownumberer',
-            'textcolumn',
-            'treecolumn'
-        ].includes(child.xtype)) {
-            if (!componentConfig.columns)
-                componentConfig.columns = [];
-            componentConfig.columns.push(child);
-        } else if (child.xtype && [
-            'menu'
-        ].includes(child.xtype) && [
-            'button'
-        ].includes(type)) {
-            if (!componentConfig.menu)
-                componentConfig.menu = child;
+    // Configuration based on children
+    configureChildren(componentConfig, children, type);
+
+    return componentConfig;
+}
+
+// Function to initialize the base configuration
+function initializeComponentConfig(type) {
+    return {
+        xtype: type.toLowerCase(),
+        listeners: [
+            createEventObject('initialize', initialize),
+            createEventObject('destroy', destroy)
+        ]
+    };
+}
+
+// Function to apply props to componentConfig
+function applyPropsToConfig(config, props) {
+    for (let prop in props) {
+        if (isEvent(prop)) {
+            addEvent(
+                config,
+                createEventObject(extractListenerName(prop), props[prop])
+            );
+        } else if (prop === 'controller' && typeof props[prop] === 'function') {
+            config[prop] = props[prop]();
+        } else if (prop === 'class') {
+            config['cls'] = props[prop];
         } else {
-            if (!componentConfig.items)
-                componentConfig.items = [];
-            componentConfig.items.push(child);
+            config[prop] = props[prop];
+        }
+    }
+}
+
+// Function to configure componentConfig based on children
+function configureChildren(config, children, type) {
+    children.forEach(child => {
+        if (child.xtype && columnTypes.includes(child.xtype)) {
+            addToArray(config, 'columns', child);
+        } else if (child.xtype === 'menu' && type === 'button') {
+            addSingle(config, 'menu', child);
+        } else if (child.xtype) {
+            addToArray(config, 'items', child);
+        } else {
+            config.html = config.html || '';
+            config.html += processValueForHtml(child);
         }
     });
+}
 
-    return componentConfig
+// Function to safely add an element to an array property
+function addToArray(config, key, item) {
+    if (!config[key]) {
+        config[key] = [];
+    }
+    config[key].push(item);
+}
+
+// Function to add a single item to a property if it's not already present
+function addSingle(config, key, item) {
+    if (!config[key]) {
+        config[key] = item;
+    }
+}
+
+// Function to handle value types and convert them to strings for HTML content
+function processValueForHtml(value) {
+    switch (typeof value) {
+        case 'string':
+        case 'number':
+        case 'boolean':
+            return String(value);
+        case 'function':
+            const result = value();
+            return (typeof result === 'string' || typeof result === 'number' || typeof result === 'boolean')
+                ? String(result)
+                : '';
+        default:
+            console.warn('Unhandled value type:', value);
+            return ''; // Returns an empty string for unsupported types
+    }
 }function detectClassType(xtype) {
     if (xtype.startsWith('ext-')) {
         xtype = xtype.split('ext-')[1];
