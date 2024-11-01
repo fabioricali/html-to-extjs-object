@@ -302,4 +302,14 @@ describe('converts html to extjs object', function () {
         assert.equal(result.columns[0].items[0].xtype, 'widgetcell');
         assert.equal(result.columns[0].items[0].items[0].xtype, 'button');
     });
+
+    it('#16, html with placeholder no string', function () {
+        let result = h`
+            <ext-toolbar>
+                <div>${1+2}</div>
+            </ext-toolbar>
+        `;
+        console.log(JSON.stringify(result, null, 4))
+        // assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+    });
 })
