@@ -298,7 +298,8 @@ describe('converts html to extjs object', function () {
                 </ext-column>
             </ext-grid>
         `;
-        console.log(result)
-        //assert.equal(result.cls, 'my-toolbar')
+        // console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.columns[0].items[0].xtype, 'widgetcell');
+        assert.equal(result.columns[0].items[0].items[0].xtype, 'button');
     });
 })
