@@ -303,13 +303,23 @@ describe('converts html to extjs object', function () {
         assert.equal(result.columns[0].items[0].items[0].xtype, 'button');
     });
 
-    it('#16, html with placeholder no string', function () {
+    it('#16, html with expression as placeholder', function () {
         let result = h`
             <ext-toolbar>
                 <div>${1+2}</div>
             </ext-toolbar>
         `;
-        console.log(JSON.stringify(result, null, 4))
-        // assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
+        //console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.items[0].html, '3');
+    });
+
+    it('#17, html with function as placeholder', function () {
+        let result = h`
+            <ext-toolbar>
+                <div>${() => 1+2}</div>
+            </ext-toolbar>
+        `;
+        //console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.items[0].html, '3');
     });
 })
