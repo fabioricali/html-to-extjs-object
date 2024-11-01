@@ -1,5 +1,5 @@
 import {createStyle, destroyStyle} from "./style.js";
-import {createContext} from "./context.js";
+import {createContext, destroyContext} from "./context.js";
 
 export function initialize() {
     createStyle.apply(this);
@@ -7,5 +7,6 @@ export function initialize() {
 }
 
 export function destroy() {
-    destroyStyle.apply(this)
+    destroyStyle.apply(this);
+    destroyContext.apply(this);
 }

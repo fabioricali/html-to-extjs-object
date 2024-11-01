@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.1 - November 13, 2022 17:59:02 */
+/* Extml, version: 2.1.15 - March 2, 2023 14:25:37 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -57,19 +57,50 @@ function destroyStyle() {
     if (!this.stylesheet) return;
     document.getElementById(STYLE_PREFIX + this.getId()).remove();
 }function createContext() {
-    Ext.getApplication().context = Ext.getApplication().context || {};
-    this.context = Ext.getApplication().context;
+    Ext.getApplication().appContext = Ext.getApplication().appContext || {};
+    this.appContext = Ext.getApplication().appContext;
     let controller = this.getController();
     //append context to controller
-    if (controller) {
-        controller.context = this.context;
-    }
+
+    let children = this.query ? this.query('*') : [];
     if (this.contextName) {
-        this.context[this.contextName] = /*this.context[this.contextName] ||*/ {};
-        this.context[this.contextName][this.getItemId()] = this;
-        this.query('*').forEach(item => {
-            this.context[this.contextName][item.getItemId()] = item;
+        if (this.appContext[this.contextName] !== undefined) {
+            // throw new Error('A context with this name already exists: ' + this.contextName);
+            console.error('A context with this name already exists: ' + this.contextName, 'itemId:', this.getItemId());
+        }
+        this.appContext[this.contextName] = /*this.context[this.contextName] ||*/ {};
+        this.appContext[this.contextName][this.getItemId()] = this;
+        children.forEach(item => {
+            this.appContext[this.contextName][item.getItemId()] = item;
+            item.appContext = this.appContext;
         });
+    }
+
+    //if (this.isContext) {
+    if (!this.context) {
+        this.context = {};
+        this.context[this.getItemId()] = this;
+        children.forEach(item => {
+            this.context[item.getItemId()] = item;
+            item.context = this.context;
+        });
+    }
+
+    if (controller) {
+        controller.appContext = this.appContext;
+        controller.context = this.context;
+        controller.props = controller.view.props;
+    }
+}
+
+function destroyContext() {
+    Ext.getApplication().appContext = Ext.getApplication().appContext || {};
+    if (this.contextName) {
+        delete Ext.getApplication().appContext[this.contextName];
+    }
+    let itemId = this.getItemId();
+    if (Ext.getApplication().appContext[itemId]) {
+        delete Ext.getApplication().appContext[itemId];
     }
 }function initialize() {
     createStyle.apply(this);
@@ -78,6 +109,7 @@ function destroyStyle() {
 
 function destroy() {
     destroyStyle.apply(this);
+    destroyContext.apply(this);
 }const htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp"];function defineExtClass(tag) {
     let className = 'html-' + tag;
     window.__extHtmlClass[className] = window.Ext.define(className, {
@@ -253,7 +285,7 @@ function addEvent(componentConfig, eventObject) {
 }function detectClassType(xtype) {
     if (xtype.startsWith('ext-')) {
         xtype = xtype.split('ext-')[1];
-    } else {
+    } else if (!xtype.startsWith('html-')) {
         xtype = 'html-' + xtype;
     }
     return xtype;
@@ -263,6 +295,10 @@ function addEvent(componentConfig, eventObject) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
+        // if (type(props).xtype && type(props).xtype.startsWith('html-')) {
+        //     // function Returns Html First
+        //     return type.apply(null);
+        // }
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
@@ -276,14 +312,17 @@ function h(strings, ...values) {
         parsed = parsed[1];
         parsed.stylesheet = styleContent;
     }
+
     //get context
     if (parsed.isContext) {
+        parsed.props = parsed.props || {};
         let contextName = parsed.props.name;
         //get possible stylesheet obtained from the upper block
         let stylesheet = parsed.stylesheet;
         parsed = parsed.children;
         parsed.stylesheet = stylesheet;
         parsed.contextName = contextName;
+        parsed.isContext = true;
     }
     return parsed
 }try {
