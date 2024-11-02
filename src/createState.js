@@ -26,7 +26,5 @@ export function createState(initialValue) {
         }
     };
 
-
-
     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 }
