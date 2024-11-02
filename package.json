@@ -12,6 +12,7 @@
     "release:minor": "npm version minor",
     "release:patch": "npm version patch",
     "build": "rollup --config rollup.config.js",
+    "watch": "rollup --config rollup.config.js --watch",
     "test": "mocha test"
   },
   "repository": {
