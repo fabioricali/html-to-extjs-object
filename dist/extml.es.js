@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.17 - November 2, 2024 15:27:56 */
+/* Extml, version: 2.1.18 - November 2, 2024 15:29:13 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -437,8 +437,6 @@ function h(strings, ...values) {
             listeners.forEach((listener) => listener(state));
         }
     };
-
-
 
     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 }try {
