@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.17 - November 2, 2024 14:52:56 */
+/* Extml, version: 2.1.17 - November 2, 2024 15:27:40 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -389,6 +389,7 @@ function createSetterName(attribute) {
 }
 
 function h(strings, ...values) {
+    //console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {

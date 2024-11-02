@@ -18,6 +18,7 @@ export function _h(type, props, ...children) {
 }
 
 export function h(strings, ...values) {
+    //console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {

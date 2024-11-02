@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.17 - November 2, 2024 14:52:56 */
+/* Extml, version: 2.1.17 - November 2, 2024 15:27:40 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -389,6 +389,7 @@ function createSetterName(attribute) {
 }
 
 function h(strings, ...values) {
+    //console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {
