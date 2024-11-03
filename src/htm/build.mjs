@@ -100,7 +100,8 @@ export const evaluate = (h, built, fields, args) => {
 			if (typeof value === "function" && value.$$isState) {
 				++i;
 				if (!Array.isArray(args[1][built[i]])) {
-					args[1][built[i]] = [args[1][built[i]]]
+					args[1][built[i]] = [args[1][built[i]]];
+					args[1][built[i]].$$isState = true;
 				}
 				args[1][built[i]].push(value);
 				//console.log(args[1][built[i]])

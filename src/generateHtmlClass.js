@@ -30,7 +30,7 @@ export function defineExtClass(tag) {
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (typeof this._propsAttributes[attribute] === 'function' &&this._propsAttributes[attribute].$$isState) {
+                                if (typeof this._propsAttributes[attribute] === 'function' && this._propsAttributes[attribute].$$isState) {
                                     if (this._propsAttributes[attribute].$$isState) {
                                         this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]());
                                         o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {

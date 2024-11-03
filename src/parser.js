@@ -1,6 +1,6 @@
-// import htm from "./htm/index.mjs";
+import htm from "./htm/index.mjs";
 // import htm from "htm";
-import htm from "./htm/min.js";
+//import htm from "./htm/min.js";
 import {createComponentConfig} from "./createComponentConfig.js";
 import {detectClassType} from "./detectClassType.js";
 
