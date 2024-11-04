@@ -129,7 +129,9 @@ function configureChildren(config, children, type) {
             } else {
                 let processedValue = processValueForHtml(child)
 
-                if (isPlainText(processedValue)) {
+                if (isPlainText(processedValue) && children.some(
+                    (item) => typeof item === 'function' && item.$$isState === true
+                )) {
                     // create html text component
                     // console.log(processValueForHtml(child))
                     addToArray(config, 'items', {

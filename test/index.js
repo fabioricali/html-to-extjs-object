@@ -306,8 +306,8 @@ describe('converts html to extjs object', function () {
                 <div>${1+2}</div>
             </ext-toolbar>
         `;
-        // console.log(JSON.stringify(result, null, 4))
-        assert.equal(result.items[0].items[0].html, '3');
+        //console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.items[0].html, '3');
     });
 
     it('#17, html with function as placeholder', function () {
@@ -317,7 +317,7 @@ describe('converts html to extjs object', function () {
             </ext-toolbar>
         `;
         // console.log(JSON.stringify(result, null, 4))
-        assert.equal(result.items[0].items[0].html, '3');
+        assert.equal(result.items[0].html, '3');
     });
 
     it('#18, column with button inside without widget', function () {
