@@ -60,7 +60,10 @@ function applyPropsToConfig(config, props) {
                     config.listeners = config.listeners || [];
                     config.listeners.push(createEventObject('initialize', (o) => {
                         o.$$stateListener = propsProp.$$subscribe(value => {
-                            o[createSetterName(prop)](value)
+                            let setterName = createSetterName(prop);
+                            if (typeof o[setterName] === 'function') {
+                                o[createSetterName(prop)](value)
+                            }
                         })
                     }))
                     config.listeners.push(createEventObject('destroy', (o) => {
@@ -78,12 +81,6 @@ function applyPropsToConfig(config, props) {
 
 // Function to configure componentConfig based on children
 function configureChildren(config, children, type) {
-    // console.log('--------')
-    // console.log('config', config)
-    // console.log('children', children)
-    // console.log('type', type)
-    // console.log('--------')
-
     children.forEach(child => {
         if (child.xtype && columnTypes.includes(child.xtype)) {
             addToArray(config, 'columns', child);
@@ -112,8 +109,9 @@ function configureChildren(config, children, type) {
             addToArray(config, 'items', child);
         } else {
             if (child.$$isState) {
+                // create signal component
                 addToArray(config, 'items', {
-                    xtype: 'html-signal',
+                    xtype: 'html-x-signal',
                     html: String(child()),
                     listeners: [
                         createEventObject('initialize', (o) => {
@@ -128,12 +126,20 @@ function configureChildren(config, children, type) {
                         })
                     ]
                 });
-                //console.log(config)
             } else {
-                config.html = config.html || '';
-                config.html += processValueForHtml(child);
+                // console.log('html', child)
+                // config.html = config.html || '';
+                // config.html += processValueForHtml(child);
+                // create html text component
+                addToArray(config, 'items', {
+                    xtype: 'html-x-text',
+                    html: processValueForHtml(child),
+                    listeners: [
+                        createEventObject('initialize', initialize),
+                        createEventObject('destroy', destroy)
+                    ]
+                });
             }
-
         }
     });
 }

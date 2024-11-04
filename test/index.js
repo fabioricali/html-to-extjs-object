@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 GlobalRegistrator.register();
-import {h, initialize, destroy, generateHtmlClass} from "../src/index.js";
+import {h, initialize, destroy, generateHtmlClass, createState} from "../src/index.js";
 import assert from 'node:assert';
 
 window.Ext = {
@@ -329,5 +329,15 @@ describe('converts html to extjs object', function () {
         // console.log(JSON.stringify(result, null, 4))
         assert.equal(result.cell.xtype, 'widgetcell');
         assert.equal(result.cell.widget.items[0].xtype, 'button');
+    });
+
+    it('#19, createState', function () {
+        let [hello, setHello] = createState(0);
+        let result = h`
+            <div>
+                ${hello}
+            </div>
+        `;
+        console.log(JSON.stringify(result, null, 4))
     });
 })
