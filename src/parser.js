@@ -8,16 +8,13 @@ export function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        // if (type(props).xtype && type(props).xtype.startsWith('html-')) {
-        //     // function Returns Html First
-        //     return type.apply(null);
-        // }
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
 
 export function h(strings, ...values) {
+    //console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {

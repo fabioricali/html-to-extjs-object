@@ -8,6 +8,8 @@ $ npm install -D extml
 
 ## Demo
 <a target="_blank" href="https://fiddle.sencha.com/#view/editor&fiddle/3lv6">LIVE HERE</a>
+## Develop (with local UMD file for testing)
+<a target="_blank" href="https://fiddle.sencha.com/#fiddle/3sfr&view/editor">LIVE HERE</a>
 
 ## Example
 ```js

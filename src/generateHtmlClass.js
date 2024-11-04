@@ -1,4 +1,5 @@
 import {htmlTags} from "./htmlTags.js";
+import {destroy} from "./defaultListeners.js";
 
 export function defineExtClass(tag) {
     let className = 'html-' + tag;
@@ -19,28 +20,25 @@ export function defineExtClass(tag) {
         ],
         getInnerHtmlElement() {
             return this.getRenderTarget();
-            // let me = this,
-            //     innerHtmlElement = me.innerHtmlElement;
-            // if (!innerHtmlElement || !innerHtmlElement.dom || !innerHtmlElement.dom.parentNode) {
-            //     me.innerHtmlElement = innerHtmlElement = Ext.Element.create({
-            //         tag: 'ghost-tag',
-            //         cls: '',
-            //     });
-            //     me.getRenderTarget().appendChild(innerHtmlElement);
-            // }
-            // return innerHtmlElement;
         },
         listeners: [
             {
-                initialize() {
+                initialize(o) {
                     //hack
                     requestAnimationFrame(() => {
                         this.el.dom.className = '';
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (typeof this._propsAttributes[attribute] === 'function') {
-                                    this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
+                                if (typeof this._propsAttributes[attribute] === 'function' && this._propsAttributes[attribute].$$isState) {
+                                    if (this._propsAttributes[attribute].$$isState) {
+                                        this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]());
+                                        o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
+                                            this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]());
+                                        })
+                                    } else {
+                                        this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
+                                    }
                                 } else {
                                     this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
                                 }
@@ -75,6 +73,13 @@ export function defineExtClass(tag) {
 
                         // Rimuovo ghost-tag
                         oldParent.remove();
+                    }
+                }
+            },
+            {
+                destroy(o) {
+                    if(o.$$stateListener) {
+                        o.$$stateListener()
                     }
                 }
             }

@@ -1,5 +1,5 @@
 import { addEvent, createEventObject, extractListenerName, isEvent } from "./event.js";
-import { destroy, initialize } from "./index.js";
+import { destroy, initialize } from "./defaultListeners.js";
 
 const columnTypes = [
     'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
@@ -13,9 +13,8 @@ export function createComponentConfig(type, props, children, propsFunction) {
 
     // Configuration based on props
     let configFromProps = Object.assign({}, props, propsFunction);
-    let isHtmlType = (configFromProps.xtype || type).startsWith('html-');
 
-    if (isHtmlType) {
+    if (isHtmlType(configFromProps.xtype || type)) {
         componentConfig._propsAttributes = props;
     } else {
         applyPropsToConfig(componentConfig, configFromProps);
@@ -25,6 +24,10 @@ export function createComponentConfig(type, props, children, propsFunction) {
     configureChildren(componentConfig, children, type);
 
     return componentConfig;
+}
+
+function isHtmlType(type) {
+    return (type).startsWith('html-')
 }
 
 // Function to initialize the base configuration
@@ -51,6 +54,23 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'class') {
             config['cls'] = props[prop];
         } else {
+            if (typeof props[prop] === 'function') {
+                let propsProp = props[prop];
+                if (propsProp.$$isState) {
+                    config.listeners = config.listeners || [];
+                    config.listeners.push(createEventObject('initialize', (o) => {
+                        o.$$stateListener = propsProp.$$subscribe(value => {
+                            o[createSetterName(prop)](value)
+                        })
+                    }))
+                    config.listeners.push(createEventObject('destroy', (o) => {
+                        if(o.$$stateListener) {
+                            o.$$stateListener()
+                        }
+                    }))
+                    props[prop] = props[prop]();
+                }
+            }
             config[prop] = props[prop];
         }
     }
@@ -66,8 +86,29 @@ function configureChildren(config, children, type) {
         } else if (child.xtype) {
             addToArray(config, 'items', child);
         } else {
-            config.html = config.html || '';
-            config.html += processValueForHtml(child);
+            if (child.$$isState) {
+                addToArray(config, 'items', {
+                    xtype: 'html-signal',
+                    html: String(child()),
+                    listeners: [
+                        createEventObject('initialize', (o) => {
+                            o.$$stateListener = child.$$subscribe(value => {
+                                o.bodyElement.el.dom.innerHTML = String(value)
+                            })
+                        }),
+                        createEventObject('destroy', (o) => {
+                            if(o.$$stateListener) {
+                                o.$$stateListener()
+                            }
+                        })
+                    ]
+                });
+                //console.log(config)
+            } else {
+                config.html = config.html || '';
+                config.html += processValueForHtml(child);
+            }
+
         }
     });
 }
@@ -103,4 +144,8 @@ function processValueForHtml(value) {
             console.warn('Unhandled value type:', value);
             return ''; // Returns an empty string for unsupported types
     }
+}
+
+function createSetterName(attribute) {
+    return `set${attribute.charAt(0).toUpperCase()}${attribute.slice(1)}`;
 }

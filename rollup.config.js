@@ -1,4 +1,3 @@
-//import { terser } from 'rollup-plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from "@el3um4s/rollup-plugin-terser";
