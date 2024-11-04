@@ -68,10 +68,8 @@ function applyPropsToConfig(config, props) {
                             o.$$stateListener()
                         }
                     }))
+                    props[prop] = props[prop]();
                 }
-
-                props[prop] = props[prop]();
-
             }
             config[prop] = props[prop];
         }
