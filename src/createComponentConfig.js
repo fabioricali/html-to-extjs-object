@@ -109,9 +109,9 @@ function configureChildren(config, children, type) {
             addToArray(config, 'items', child);
         } else {
             if (child.$$isState) {
-                // create signal component
+                // create state component
                 addToArray(config, 'items', {
-                    xtype: 'html-x-signal',
+                    xtype: 'html-x-state',
                     html: String(child()),
                     listeners: [
                         createEventObject('initialize', (o) => {
@@ -129,6 +129,7 @@ function configureChildren(config, children, type) {
             } else {
                 let processedValue = processValueForHtml(child)
 
+                // if there is some state in the children array it's better to use the html-x-html
                 if (isPlainText(processedValue) && children.some(
                     (item) => typeof item === 'function' && item.$$isState === true
                 )) {
