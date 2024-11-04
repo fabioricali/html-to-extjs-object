@@ -287,20 +287,17 @@ describe('converts html to extjs object', function () {
         assert.equal(result.cls, 'my-toolbar')
     });
 
-    it('#15, column with widget', function () {
-        function createContext() {}
+    it('#15, column with widgetcell', function () {
         let result = h`
-            <ext-grid>
-                <ext-column>
-                    <ext-widgetcell> 
-                        <ext-button></ext-button>
-                    </ext-widgetcell>
-                </ext-column>
-            </ext-grid>
+            <ext-column>
+                <ext-widgetcell forceWidth="${true}">
+                    <ext-button iconCls="x-fa fas fa-eye" text="download"/>
+                </ext-widgetcell>
+            </ext-column>
         `;
         // console.log(JSON.stringify(result, null, 4))
-        assert.equal(result.columns[0].items[0].xtype, 'widgetcell');
-        assert.equal(result.columns[0].items[0].items[0].xtype, 'button');
+        assert.equal(result.cell.xtype, 'widgetcell');
+        assert.equal(result.cell.widget.items[0].xtype, 'button');
     });
 
     it('#16, html with expression as placeholder', function () {
@@ -321,5 +318,16 @@ describe('converts html to extjs object', function () {
         `;
         //console.log(JSON.stringify(result, null, 4))
         assert.equal(result.items[0].html, '3');
+    });
+
+    it('#18, column with button inside without widget', function () {
+        let result = h`
+            <ext-column>
+                <ext-button iconCls="x-fa fas fa-eye" text="download"/>
+            </ext-column>
+        `;
+        // console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.cell.xtype, 'widgetcell');
+        assert.equal(result.cell.widget.items[0].xtype, 'button');
     });
 })
