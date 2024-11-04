@@ -163,7 +163,7 @@ describe('converts html to extjs object', function () {
                 ${myHtml}
             </ext-toolbar>
         `;
-        //console.log(result)
+        // console.log(result)
         assert.deepEqual(result, { xtype: 'toolbar', listeners: Object.assign([], defaultListeners), html: '<div>sss</div>' });
     });
 
@@ -306,8 +306,8 @@ describe('converts html to extjs object', function () {
                 <div>${1+2}</div>
             </ext-toolbar>
         `;
-        //console.log(JSON.stringify(result, null, 4))
-        assert.equal(result.items[0].html, '3');
+        // console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.items[0].items[0].html, '3');
     });
 
     it('#17, html with function as placeholder', function () {
@@ -316,8 +316,8 @@ describe('converts html to extjs object', function () {
                 <div>${() => 1+2}</div>
             </ext-toolbar>
         `;
-        //console.log(JSON.stringify(result, null, 4))
-        assert.equal(result.items[0].html, '3');
+        // console.log(JSON.stringify(result, null, 4))
+        assert.equal(result.items[0].items[0].html, '3');
     });
 
     it('#18, column with button inside without widget', function () {
@@ -329,15 +329,5 @@ describe('converts html to extjs object', function () {
         // console.log(JSON.stringify(result, null, 4))
         assert.equal(result.cell.xtype, 'widgetcell');
         assert.equal(result.cell.widget.items[0].xtype, 'button');
-    });
-
-    it('#19, createState', function () {
-        let [hello, setHello] = createState(0);
-        let result = h`
-            <div>
-                ${hello}
-            </div>
-        `;
-        console.log(JSON.stringify(result, null, 4))
     });
 })

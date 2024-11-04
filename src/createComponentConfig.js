@@ -127,21 +127,32 @@ function configureChildren(config, children, type) {
                     ]
                 });
             } else {
-                // console.log('html', child)
-                // config.html = config.html || '';
-                // config.html += processValueForHtml(child);
-                // create html text component
-                addToArray(config, 'items', {
-                    xtype: 'html-x-text',
-                    html: processValueForHtml(child),
-                    listeners: [
-                        createEventObject('initialize', initialize),
-                        createEventObject('destroy', destroy)
-                    ]
-                });
+                let processedValue = processValueForHtml(child)
+
+                if (isPlainText(processedValue)) {
+                    // create html text component
+                    // console.log(processValueForHtml(child))
+                    addToArray(config, 'items', {
+                        xtype: 'html-x-html',
+                        html: processedValue,
+                        listeners: [
+                            createEventObject('initialize', initialize),
+                            createEventObject('destroy', destroy)
+                        ]
+                    });
+                } else {
+                    // console.log('html', child)
+                    config.html = config.html || '';
+                    config.html += processedValue;
+                }
             }
         }
     });
+}
+
+function isPlainText(str) {
+    const htmlTagPattern = /<[^>]*>/g;
+    return !htmlTagPattern.test(str);
 }
 
 // Function to safely add an element to an array property
