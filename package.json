@@ -1,6 +1,6 @@
 {
   "name": "extml",
-  "version": "2.1.18",
+  "version": "2.1.16",
   "description": "Converts html tagged templates to ExtJS component object.",
   "main": "src/index.js",
   "module": "dist/extml.es.js",
@@ -12,7 +12,6 @@
     "release:minor": "npm version minor",
     "release:patch": "npm version patch",
     "build": "rollup --config rollup.config.js",
-    "watch": "rollup --config rollup.config.js --watch",
     "test": "mocha test"
   },
   "repository": {
