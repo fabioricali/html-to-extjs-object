@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.22 - November 4, 2024 15:19:39 */
+/* Extml, version: 2.2.0 - November 4, 2024 16:54:44 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -294,11 +294,36 @@ function applyPropsToConfig(config, props) {
 
 // Function to configure componentConfig based on children
 function configureChildren(config, children, type) {
+    // console.log('--------')
+    // console.log('config', config)
+    // console.log('children', children)
+    // console.log('type', type)
+    // console.log('--------')
+
     children.forEach(child => {
         if (child.xtype && columnTypes.includes(child.xtype)) {
             addToArray(config, 'columns', child);
         } else if (child.xtype === 'menu' && type === 'button') {
             addSingle(config, 'menu', child);
+        } else if (child.xtype === 'button' && columnTypes.includes(type)) {
+            addSingle(config, 'cell', {
+                xtype: 'widgetcell',
+                forceWidth: true,
+                widget: {
+                    xtype: 'container',
+                    items: []
+                }
+            });
+            addToArray(config.cell.widget, 'items', child);
+        } else if (child.xtype === 'button' && type === 'widgetcell') {
+            // create widget child container
+            addSingle(config, 'widget', {
+                xtype: 'container',
+                items: []
+            });
+            addToArray(config.widget, 'items', child);
+        } else if (child.xtype === 'widgetcell') {
+            addSingle(config, 'cell', child);
         } else if (child.xtype) {
             addToArray(config, 'items', child);
         } else {
