@@ -1,4 +1,4 @@
-/* Extml, version: 2.1.21 - November 4, 2024 12:30:57 */
+/* Extml, version: 2.1.22 - November 4, 2024 15:19:39 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -110,7 +110,7 @@ function destroyContext() {
 function destroy() {
     destroyStyle.apply(this);
     destroyContext.apply(this);
-}const htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp"];function defineExtClass(tag) {
+}const htmlTags = ["a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp", "signal"];function defineExtClass(tag) {
     let className = 'html-' + tag;
     window.__extHtmlClass[className] = window.Ext.define(className, {
         extend: 'Ext.Container',
@@ -129,28 +129,25 @@ function destroy() {
         ],
         getInnerHtmlElement() {
             return this.getRenderTarget();
-            // let me = this,
-            //     innerHtmlElement = me.innerHtmlElement;
-            // if (!innerHtmlElement || !innerHtmlElement.dom || !innerHtmlElement.dom.parentNode) {
-            //     me.innerHtmlElement = innerHtmlElement = Ext.Element.create({
-            //         tag: 'ghost-tag',
-            //         cls: '',
-            //     });
-            //     me.getRenderTarget().appendChild(innerHtmlElement);
-            // }
-            // return innerHtmlElement;
         },
         listeners: [
             {
-                initialize() {
+                initialize(o) {
                     //hack
                     requestAnimationFrame(() => {
                         this.el.dom.className = '';
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (typeof this._propsAttributes[attribute] === 'function') {
-                                    this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
+                                if (typeof this._propsAttributes[attribute] === 'function' && this._propsAttributes[attribute].$$isState) {
+                                    if (this._propsAttributes[attribute].$$isState) {
+                                        this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]());
+                                        o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
+                                            this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]());
+                                        });
+                                    } else {
+                                        this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
+                                    }
                                 } else {
                                     this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
                                 }
@@ -185,6 +182,13 @@ function destroy() {
 
                         // Rimuovo ghost-tag
                         oldParent.remove();
+                    }
+                }
+            },
+            {
+                destroy(o) {
+                    if(o.$$stateListener) {
+                        o.$$stateListener();
                     }
                 }
             }
@@ -225,9 +229,8 @@ function createComponentConfig(type, props, children, propsFunction) {
 
     // Configuration based on props
     let configFromProps = Object.assign({}, props, propsFunction);
-    let isHtmlType = (configFromProps.xtype || type).startsWith('html-');
 
-    if (isHtmlType) {
+    if (isHtmlType(configFromProps.xtype || type)) {
         componentConfig._propsAttributes = props;
     } else {
         applyPropsToConfig(componentConfig, configFromProps);
@@ -237,6 +240,10 @@ function createComponentConfig(type, props, children, propsFunction) {
     configureChildren(componentConfig, children, type);
 
     return componentConfig;
+}
+
+function isHtmlType(type) {
+    return (type).startsWith('html-')
 }
 
 // Function to initialize the base configuration
@@ -263,6 +270,23 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'class') {
             config['cls'] = props[prop];
         } else {
+            if (typeof props[prop] === 'function') {
+                let propsProp = props[prop];
+                if (propsProp.$$isState) {
+                    config.listeners = config.listeners || [];
+                    config.listeners.push(createEventObject('initialize', (o) => {
+                        o.$$stateListener = propsProp.$$subscribe(value => {
+                            o[createSetterName(prop)](value);
+                        });
+                    }));
+                    config.listeners.push(createEventObject('destroy', (o) => {
+                        if(o.$$stateListener) {
+                            o.$$stateListener();
+                        }
+                    }));
+                    props[prop] = props[prop]();
+                }
+            }
             config[prop] = props[prop];
         }
     }
@@ -278,8 +302,29 @@ function configureChildren(config, children, type) {
         } else if (child.xtype) {
             addToArray(config, 'items', child);
         } else {
-            config.html = config.html || '';
-            config.html += processValueForHtml(child);
+            if (child.$$isState) {
+                addToArray(config, 'items', {
+                    xtype: 'html-signal',
+                    html: String(child()),
+                    listeners: [
+                        createEventObject('initialize', (o) => {
+                            o.$$stateListener = child.$$subscribe(value => {
+                                o.bodyElement.el.dom.innerHTML = String(value);
+                            });
+                        }),
+                        createEventObject('destroy', (o) => {
+                            if(o.$$stateListener) {
+                                o.$$stateListener();
+                            }
+                        })
+                    ]
+                });
+                //console.log(config)
+            } else {
+                config.html = config.html || '';
+                config.html += processValueForHtml(child);
+            }
+
         }
     });
 }
@@ -315,6 +360,10 @@ function processValueForHtml(value) {
             console.warn('Unhandled value type:', value);
             return ''; // Returns an empty string for unsupported types
     }
+}
+
+function createSetterName(attribute) {
+    return `set${attribute.charAt(0).toUpperCase()}${attribute.slice(1)}`;
 }function detectClassType(xtype) {
     if (xtype.startsWith('ext-')) {
         xtype = xtype.split('ext-')[1];
@@ -328,16 +377,13 @@ function processValueForHtml(value) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        // if (type(props).xtype && type(props).xtype.startsWith('html-')) {
-        //     // function Returns Html First
-        //     return type.apply(null);
-        // }
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
 
 function h(strings, ...values) {
+    //console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {
@@ -358,8 +404,37 @@ function h(strings, ...values) {
         parsed.isContext = true;
     }
     return parsed
+}function createState(initialValue) {
+    let state = initialValue;
+    const listeners = new Set();
+
+    // Funzione getter che restituisce un oggetto con valore e tipo
+    // const getState = () => ({
+    //     value: state,
+    //     $$isState: true,
+    //     subscribe,
+    // });
+    // Funzione per iscriversi ai cambiamenti di stato
+    const subscribe = (listener) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener); // Ritorna una funzione per rimuovere l'observer
+    };
+    // Funzione getter che restituisce un oggetto con valore e tipo
+    const getState = () => state;
+    getState.$$isState = true; // Aggiunge la proprietà isState direttamente alla funzione
+    getState.$$subscribe = subscribe;
+
+    // Funzione setter
+    const setState = (newValue) => {
+        if (newValue !== state) {
+            state = newValue;
+            listeners.forEach((listener) => listener(state));
+        }
+    };
+
+    return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.createState=createState;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
