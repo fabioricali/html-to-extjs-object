@@ -1,4 +1,4 @@
-/* Extml, version: 2.2.2 - November 4, 2024 19:58:11 */
+/* Extml, version: 2.2.3 - November 4, 2024 20:04:30 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -348,7 +348,7 @@ function configureChildren(config, children, type) {
                 });
             } else {
                 let processedValue = processValueForHtml(child);
-                
+
                 if (isPlainText(processedValue) && children.some(
                     (item) => typeof item === 'function' && item.$$isState === true
                 )) {
