@@ -1,4 +1,4 @@
-/* Extml, version: 2.2.1 - November 4, 2024 18:21:27 */
+/* Extml, version: 2.2.2 - November 4, 2024 18:22:16 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
