@@ -1,4 +1,4 @@
-/* Extml, version: 2.2.4 - November 5, 2024 07:47:40 */
+/* Extml, version: 2.2.4 - November 5, 2024 09:52:40 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -539,27 +539,59 @@ function applyPropsToConfig(config, props) {
             config[prop] = props[prop]();
         } else if (prop === 'class') {
             config['cls'] = props[prop];
-        } else {
-            if (typeof props[prop] === 'function') {
-                let propsProp = props[prop];
-                if (propsProp.$$isState) {
-                    config.listeners = config.listeners || [];
-                    config.listeners.push(createEventObject('initialize', (o) => {
-                        o.$$stateListener = propsProp.$$subscribe(value => {
+        } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
+            let buildAttributeValue = () => props[prop].map(item => {
+                if (typeof item === 'function' && item.$$isState) {
+                    return item()
+                } else {
+                    return item
+                }
+            }).join('');
+
+            config[prop] = buildAttributeValue();
+
+            config.listeners = config.listeners || [];
+
+            config.listeners.push(createEventObject('initialize', (o) => {
+                o.$$attributesStateListeners = [];
+                // per ogni state sottoscrivo un listener per ricostruire nuovamente il valore dell'attributo ad ogni cambiamento
+                props[prop].forEach(item => {
+                    if (typeof item === 'function' && item.$$isState) {
+                        o.$$attributesStateListeners.push(item.$$subscribe(value => {
                             let setterName = createSetterName(prop);
                             if (typeof o[setterName] === 'function') {
-                                o[createSetterName(prop)](value);
+                                o[createSetterName(prop)](buildAttributeValue());
                             }
-                        });
-                    }));
-                    config.listeners.push(createEventObject('destroy', (o) => {
-                        if(o.$$stateListener) {
-                            o.$$stateListener();
-                        }
-                    }));
-                    props[prop] = props[prop]();
+                        }));
+                    }
+                });
+            }));
+            config.listeners.push(createEventObject('destroy', (o) => {
+                if (o.$$attributesStateListeners) {
+                    o.$$attributesStateListeners.forEach(listener => listener());
                 }
+            }));
+        } else if (typeof props[prop] === 'function') {
+            let propsProp = props[prop];
+            if (propsProp.$$isState) {
+                config.listeners = config.listeners || [];
+                config.listeners.push(createEventObject('initialize', (o) => {
+                    o.$$stateListener = propsProp.$$subscribe(value => {
+                        let setterName = createSetterName(prop);
+                        if (typeof o[setterName] === 'function') {
+                            o[createSetterName(prop)](value);
+                        }
+                    });
+                }));
+                config.listeners.push(createEventObject('destroy', (o) => {
+                    if (o.$$stateListener) {
+                        o.$$stateListener();
+                    }
+                }));
+                props[prop] = props[prop]();
             }
+            config[prop] = props[prop];
+        } else {
             config[prop] = props[prop];
         }
     }
@@ -606,7 +638,7 @@ function configureChildren(config, children, type) {
                             });
                         }),
                         createEventObject('destroy', (o) => {
-                            if(o.$$stateListener) {
+                            if (o.$$stateListener) {
                                 o.$$stateListener();
                             }
                         })
