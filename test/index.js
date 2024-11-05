@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 GlobalRegistrator.register();
-import {h, initialize, destroy, generateHtmlClass, createState} from "../src/index.js";
+import {h, initialize, destroy, generateHtmlClass, createState, createRef} from "../src/index.js";
 import assert from 'node:assert';
 
 window.Ext = {
@@ -446,3 +446,18 @@ describe('createState', function () {
         assert.equal(myDate().getTime(), newDate.getTime());
     });
 });
+
+describe('createRef', function () {
+    it('#1 declaration', function () {
+        const myColumRef = createRef()
+
+        let result = h`
+            <ext-column ref="${myColumRef}">
+                <ext-button iconCls="x-fa fas fa-eye" text="download"/>
+            </ext-column>
+        `;
+        console.log(JSON.stringify(result, null, 4))
+        // assert.equal(result.cell.xtype, 'widgetcell');
+        // assert.equal(result.cell.widget.items[0].xtype, 'button');
+    });
+})

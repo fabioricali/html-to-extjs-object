@@ -1,4 +1,4 @@
-/* Extml, version: 2.3.0 - November 5, 2024 14:11:33 */
+/* Extml, version: 2.3.0 - November 5, 2024 16:45:33 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -537,6 +537,11 @@ function applyPropsToConfig(config, props) {
             );
         } else if (prop === 'controller' && typeof props[prop] === 'function') {
             config[prop] = props[prop]();
+        } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
+            config.listeners = config.listeners || [];
+            config.listeners.push(createEventObject('initialize', (o) => {
+                props[prop].current = o;
+            }));
         } else if (prop === 'class') {
             config['cls'] = props[prop];
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
@@ -854,7 +859,6 @@ function h(strings, ...values) {
     return [isObject ? stateGetters : getState, setState, subscribe];
 }
 
-
 // export function createState(initialValue) {
 //     let state = initialValue;
 //     const listeners = new Set();
@@ -879,8 +883,23 @@ function h(strings, ...values) {
 //
 //     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 // }
-try {
+function createRef(onChange) {
+    let _current = null;
+
+    return {
+        $$isRef: true,
+        get current() {
+            return _current;
+        },
+        set current(value) {
+            _current = value;
+            if (typeof onChange === "function") {
+                onChange(value);
+            }
+        },
+    };
+}try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{createState,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{createRef,createState,destroy,generateHtmlClass,h,initialize};

@@ -95,7 +95,6 @@ export function createState(initialValue, treatAsSingleEntity = false) {
     return [isObject ? stateGetters : getState, setState, subscribe];
 }
 
-
 // export function createState(initialValue) {
 //     let state = initialValue;
 //     const listeners = new Set();

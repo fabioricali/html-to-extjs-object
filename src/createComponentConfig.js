@@ -51,6 +51,11 @@ function applyPropsToConfig(config, props) {
             );
         } else if (prop === 'controller' && typeof props[prop] === 'function') {
             config[prop] = props[prop]();
+        } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
+            config.listeners = config.listeners || [];
+            config.listeners.push(createEventObject('initialize', (o) => {
+                props[prop].current = o;
+            }))
         } else if (prop === 'class') {
             config['cls'] = props[prop];
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
