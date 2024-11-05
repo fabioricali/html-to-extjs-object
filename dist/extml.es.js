@@ -1,4 +1,4 @@
-/* Extml, version: 2.4.5 - November 5, 2024 18:10:41 */
+/* Extml, version: 2.4.5 - November 5, 2024 22:28:51 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -169,7 +169,7 @@ function addEvent(componentConfig, eventObject) {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
                                 } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
-                                    this._propsAttributes[attribute].current = o.el.dom;
+                                    this._propsAttributes[attribute](o.el.dom);
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
@@ -543,7 +543,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop].current = o;
+                props[prop](o);
             }));
         } else if (prop === 'class') {
             config['cls'] = props[prop];
@@ -888,23 +888,44 @@ function h(strings, ...values) {
 // }
 function createRef(onChange) {
     let _current = null;
+    const subscribers = [];
 
-    return {
-        $$isRef: true,  // Proprietà speciale per identificare l'oggetto come ref
-
-        get current() {
+    const ref = function(value) {
+        if (arguments.length === 0) {
+            // Getter
             return _current;
-        },
-        set current(value) {
+        } else {
+            // Setter
             if (_current !== value) {
                 _current = value;
-                //console.log("Valore impostato:", _current);  // Log per debug
                 if (typeof onChange === "function") {
                     onChange(value);
                 }
+                // Notifica tutti i subscriber del cambiamento
+                subscribers.forEach(callback => callback(value));
             }
-        },
+        }
     };
+
+    // Proprietà speciale per identificare l'oggetto come ref
+    ref.$$isRef = true;
+
+    // Metodo per aggiungere subscriber
+    ref.$$subscribe = function(callback) {
+        if (typeof callback === "function") {
+            subscribers.push(callback);
+            return () => {
+                // Restituisci una funzione di unsubscribe
+                const index = subscribers.indexOf(callback);
+                if (index !== -1) {
+                    subscribers.splice(index, 1);
+                }
+            };
+        }
+        throw new Error("Callback deve essere una funzione");
+    };
+
+    return ref;
 }try {
     if (window) {
         generateHtmlClass();
