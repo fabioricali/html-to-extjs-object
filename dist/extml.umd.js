@@ -1,4 +1,4 @@
-/* Extml, version: 2.3.0 - November 5, 2024 16:45:33 */
+/* Extml, version: 2.3.0 - November 5, 2024 17:10:44 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -114,7 +114,23 @@ function destroy() {
     "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
     //custom tag
     "x-state", "x-html"
-];function defineExtClass(tag) {
+];function isEvent(prop) {
+    return prop.startsWith('on')
+}
+
+function extractListenerName(prop) {
+    return prop.substring(2)
+}
+
+function createEventObject(name, handle) {
+    let event = {};
+    event[name] = handle;
+    return event;
+}
+
+function addEvent(componentConfig, eventObject) {
+    componentConfig.listeners.push(eventObject);
+}function defineExtClass(tag) {
     let className = 'html-' + tag;
     window.__extHtmlClass[className] = window.Ext.define(className, {
         extend: 'Ext.Container',
@@ -152,6 +168,8 @@ function destroy() {
                                     } else {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
+                                } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
+                                    this._propsAttributes[attribute].current = o.el.dom;
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
@@ -177,6 +195,7 @@ function destroy() {
                                         });
 
                                     } else {
+                                        // console.log(attribute)
                                         this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
                                     }
                                 }
@@ -471,23 +490,7 @@ const regular = function(statics) {
 	return tmp.length > 1 ? tmp : tmp[0];
 };
 
-var htm = regular;function isEvent(prop) {
-    return prop.startsWith('on')
-}
-
-function extractListenerName(prop) {
-    return prop.substring(2)
-}
-
-function createEventObject(name, handle) {
-    let event = {};
-    event[name] = handle;
-    return event;
-}
-
-function addEvent(componentConfig, eventObject) {
-    componentConfig.listeners.push(eventObject);
-}const columnTypes = [
+var htm = regular;const columnTypes = [
     'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
     'checkcolumn', 'datecolumn', 'numbercolumn', 'rownumberer',
     'textcolumn', 'treecolumn'

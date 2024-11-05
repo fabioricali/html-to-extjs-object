@@ -1,5 +1,6 @@
 import {htmlTags} from "./htmlTags.js";
 import {destroy} from "./defaultListeners.js";
+import {createEventObject} from "./event.js";
 
 export function defineExtClass(tag) {
     let className = 'html-' + tag;
@@ -39,6 +40,8 @@ export function defineExtClass(tag) {
                                     } else {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
+                                } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
+                                    this._propsAttributes[attribute].current = o.el.dom
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
@@ -64,6 +67,7 @@ export function defineExtClass(tag) {
                                         })
 
                                     } else {
+                                        // console.log(attribute)
                                         this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
                                     }
                                 }
