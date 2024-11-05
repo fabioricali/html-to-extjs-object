@@ -54,7 +54,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop].value = o;
+                props[prop].current = o;
             }))
         } else if (prop === 'class') {
             config['cls'] = props[prop];

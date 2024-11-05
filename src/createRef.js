@@ -1,28 +1,22 @@
 function createRef(onChange) {
-    let _value = null;
+    let _current = null;
 
-    const ref = {
-        $$isRef: true,
-    };
+    return {
+        $$isRef: true,  // Proprietà speciale per identificare l'oggetto come ref
 
-    return new Proxy(ref, {
-        get(target, prop) {
-            // Se accedi a $$isRef, restituisci quella proprietà
-            if (prop === "$$isRef") return target.$$isRef;
-            // Altrimenti, restituisci _value come valore "predefinito"
-            return _value;
+        get current() {
+            return _current;
         },
-        set(target, prop, newValue) {
-            // Imposta _value direttamente come valore "predefinito"
-            if (prop !== "$$isRef" && _value !== newValue) {
-                _value = newValue;
+        set current(value) {
+            if (_current !== value) {
+                _current = value;
+                //console.log("Valore impostato:", _current);  // Log per debug
                 if (typeof onChange === "function") {
-                    onChange(newValue);
+                    onChange(value);
                 }
             }
-            return true;
         },
-    });
+    };
 }
 
 export default createRef;
