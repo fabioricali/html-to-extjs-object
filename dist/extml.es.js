@@ -1,4 +1,4 @@
-/* Extml, version: 2.4.5 - November 5, 2024 22:28:51 */
+/* Extml, version: 2.4.5 - November 5, 2024 22:42:58 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -926,8 +926,24 @@ function createRef(onChange) {
     };
 
     return ref;
+}function createEffect(effect, dependencies, runInitially = true) {
+    if (typeof effect !== "function") {
+        throw new Error("Effect must be a function");
+    }
+    if (!Array.isArray(dependencies) || dependencies.some(dep => typeof dep.$$subscribe !== "function")) {
+        throw new Error("Dependencies must be functions with the method $$subscribe");
+    }
+
+    // Esegui l'effetto inizialmente se specificato
+    if (runInitially) effect();
+
+    // Sottoscrivi le dipendenze e memorizza le funzioni di unsubscribe
+    const unsubscribes = dependencies.map(dep => dep.$$subscribe(() => effect()));
+
+    // Restituisci una funzione di cleanup per annullare tutte le sottoscrizioni
+    return () => unsubscribes.forEach(unsubscribe => unsubscribe());
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{createRef,createState,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{createEffect,createRef,createState,destroy,generateHtmlClass,h,initialize};
