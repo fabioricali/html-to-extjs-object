@@ -1,22 +1,24 @@
 function createRef(onChange) {
     let _value = null;
 
-    function ref(value) {
-        if (arguments.length === 0) {
-            // Se non viene passato nessun valore, ritorna il valore corrente
-            return _value;
-        } else if (_value !== value) {
-            // Aggiorna solo se il valore cambia
-            _value = value;
-            if (typeof onChange === "function") {
-                onChange(value);
-            }
+    return new Proxy(
+        {$$isRef: true},
+        {
+            get(target, prop) {
+                if (prop === "$$isRef") return target.$$isRef;
+                return _value; // Ritorna il valore direttamente su qualsiasi accesso diverso da $$isRef
+            },
+            set(target, prop, newValue) {
+                if (prop !== "$$isRef" && _value !== newValue) {
+                    _value = newValue;
+                    if (typeof onChange === "function") {
+                        onChange(newValue);
+                    }
+                }
+                return true;
+            },
         }
-    }
-
-    ref.$$isRef = true;
-
-    return ref;
+    );
 }
 
 export default createRef;

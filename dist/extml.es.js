@@ -1,4 +1,4 @@
-/* Extml, version: 2.4.2 - November 5, 2024 17:34:44 */
+/* Extml, version: 2.4.2 - November 5, 2024 17:46:04 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -169,7 +169,7 @@ function addEvent(componentConfig, eventObject) {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
                                 } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
-                                    this._propsAttributes[attribute](o.el.dom);
+                                    this._propsAttributes[attribute].value = o.el.dom;
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
@@ -543,7 +543,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop](o);
+                props[prop].value = o;
             }));
         } else if (prop === 'class') {
             config['cls'] = props[prop];
@@ -889,22 +889,24 @@ function h(strings, ...values) {
 function createRef(onChange) {
     let _value = null;
 
-    function ref(value) {
-        if (arguments.length === 0) {
-            // Se non viene passato nessun valore, ritorna il valore corrente
-            return _value;
-        } else if (_value !== value) {
-            // Aggiorna solo se il valore cambia
-            _value = value;
-            if (typeof onChange === "function") {
-                onChange(value);
-            }
+    return new Proxy(
+        {$$isRef: true},
+        {
+            get(target, prop) {
+                if (prop === "$$isRef") return target.$$isRef;
+                return _value; // Ritorna il valore direttamente su qualsiasi accesso diverso da $$isRef
+            },
+            set(target, prop, newValue) {
+                if (prop !== "$$isRef" && _value !== newValue) {
+                    _value = newValue;
+                    if (typeof onChange === "function") {
+                        onChange(newValue);
+                    }
+                }
+                return true;
+            },
         }
-    }
-
-    ref.$$isRef = true;
-
-    return ref;
+    );
 }try {
     if (window) {
         generateHtmlClass();
