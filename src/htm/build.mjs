@@ -89,13 +89,25 @@ export const evaluate = (h, built, fields, args) => {
 			args[0] = value;
 		}
 		else if (type === PROPS_ASSIGN) {
+			console.log('f')
 			args[1] = Object.assign(args[1] || {}, value);
 		}
 		else if (type === PROP_SET) {
 			(args[1] = args[1] || {})[built[++i]] = value;
 		}
 		else if (type === PROP_APPEND) {
-			args[1][built[++i]] += (value + '');
+			// support for array of prop
+			if (typeof value === "function" && value.$$isState) {
+				++i;
+				if (!Array.isArray(args[1][built[i]])) {
+					args[1][built[i]] = [args[1][built[i]]];
+					args[1][built[i]].$$hasState = true;
+				}
+				args[1][built[i]].push(value);
+				//console.log(args[1][built[i]])
+			} else {
+				args[1][built[++i]] += (value + '');
+			}
 		}
 		else if (type) { // type === CHILD_RECURSE
 			// Set the operation list (including the staticness bits) as

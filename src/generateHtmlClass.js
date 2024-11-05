@@ -40,7 +40,30 @@ export function defineExtClass(tag) {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
                                 } else {
-                                    this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
+                                    if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
+                                        console.log('aaaaaaaaa', attribute, this._propsAttributes[attribute]);
+                                        let execSetAttribute = () => this.el.dom.setAttribute(attribute, this._propsAttributes[attribute].map(item => {
+                                            if (typeof item === 'function' && item.$$isState) {
+                                                return item()
+                                            } else {
+                                                return item
+                                            }
+                                        }).join(''));
+
+                                        execSetAttribute();
+
+                                        o.$$attributesStateListeners = [];
+                                        this._propsAttributes[attribute].forEach(item => {
+                                            if (typeof item === 'function' && item.$$isState) {
+                                                o.$$attributesStateListeners.push(item.$$subscribe(value => {
+                                                    execSetAttribute();
+                                                }))
+                                            }
+                                        })
+
+                                    } else {
+                                        this.el.dom.setAttribute(attribute, this._propsAttributes[attribute]);
+                                    }
                                 }
                             });
                         }
@@ -80,6 +103,10 @@ export function defineExtClass(tag) {
                 destroy(o) {
                     if(o.$$stateListener) {
                         o.$$stateListener()
+                    }
+
+                    if (o.$$attributesStateListeners) {
+                        o.$$attributesStateListeners.forEach(listener => listener());
                     }
                 }
             }

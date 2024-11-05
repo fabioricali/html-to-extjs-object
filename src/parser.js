@@ -1,4 +1,5 @@
-import htm from "htm";
+// import htm from "htm";
+import htm from "./htm";
 import {createComponentConfig} from "./createComponentConfig.js";
 import {detectClassType} from "./detectClassType.js";
 
