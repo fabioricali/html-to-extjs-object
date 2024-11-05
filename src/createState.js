@@ -2,12 +2,6 @@ export function createState(initialValue) {
     let state = initialValue;
     const listeners = new Set();
 
-    // Funzione getter che restituisce un oggetto con valore e tipo
-    // const getState = () => ({
-    //     value: state,
-    //     $$isState: true,
-    //     subscribe,
-    // });
     // Funzione per iscriversi ai cambiamenti di stato
     const subscribe = (listener) => {
         listeners.add(listener);

@@ -175,21 +175,24 @@ function addSingle(config, key, item) {
 
 // Function to handle value types and convert them to strings for HTML content
 function processValueForHtml(value) {
-    switch (typeof value) {
-        case 'string':
-        case 'number':
-        case 'boolean':
-            return String(value);
-        case 'function':
-            const result = value();
-            return (typeof result === 'string' || typeof result === 'number' || typeof result === 'boolean')
-                ? String(result)
-                : '';
-        default:
-            console.warn('Unhandled value type:', value);
-            return ''; // Returns an empty string for unsupported types
+    const convertableTypes = ['string', 'number', 'boolean'];
+
+    // Verifica se il valore è di un tipo convertibile direttamente
+    if (convertableTypes.includes(typeof value)) {
+        return String(value);
     }
+
+    // Se è una funzione, eseguila e processa il risultato
+    if (typeof value === 'function') {
+        const result = value();
+        return convertableTypes.includes(typeof result) ? String(result) : '';
+    }
+
+    // Warning per tipi non gestiti
+    console.warn('Unhandled value type:', value);
+    return ''; // Valore di default per tipi non supportati
 }
+
 
 function createSetterName(attribute) {
     return `set${attribute.charAt(0).toUpperCase()}${attribute.slice(1)}`;

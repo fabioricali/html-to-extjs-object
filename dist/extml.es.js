@@ -1,4 +1,4 @@
-/* Extml, version: 2.2.4 - November 4, 2024 20:39:27 */
+/* Extml, version: 2.2.4 - November 5, 2024 06:41:43 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -395,21 +395,24 @@ function addSingle(config, key, item) {
 
 // Function to handle value types and convert them to strings for HTML content
 function processValueForHtml(value) {
-    switch (typeof value) {
-        case 'string':
-        case 'number':
-        case 'boolean':
-            return String(value);
-        case 'function':
-            const result = value();
-            return (typeof result === 'string' || typeof result === 'number' || typeof result === 'boolean')
-                ? String(result)
-                : '';
-        default:
-            console.warn('Unhandled value type:', value);
-            return ''; // Returns an empty string for unsupported types
+    const convertableTypes = ['string', 'number', 'boolean'];
+
+    // Verifica se il valore è di un tipo convertibile direttamente
+    if (convertableTypes.includes(typeof value)) {
+        return String(value);
     }
+
+    // Se è una funzione, eseguila e processa il risultato
+    if (typeof value === 'function') {
+        const result = value();
+        return convertableTypes.includes(typeof result) ? String(result) : '';
+    }
+
+    // Warning per tipi non gestiti
+    console.warn('Unhandled value type:', value);
+    return ''; // Valore di default per tipi non supportati
 }
+
 
 function createSetterName(attribute) {
     return `set${attribute.charAt(0).toUpperCase()}${attribute.slice(1)}`;
@@ -457,12 +460,6 @@ function h(strings, ...values) {
     let state = initialValue;
     const listeners = new Set();
 
-    // Funzione getter che restituisce un oggetto con valore e tipo
-    // const getState = () => ({
-    //     value: state,
-    //     $$isState: true,
-    //     subscribe,
-    // });
     // Funzione per iscriversi ai cambiamenti di stato
     const subscribe = (listener) => {
         listeners.add(listener);
