@@ -1,4 +1,4 @@
-/* Extml, version: 2.2.4 - November 5, 2024 07:10:53 */
+/* Extml, version: 2.2.4 - November 5, 2024 07:47:40 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -154,8 +154,9 @@ function destroy() {
                                     }
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
-                                        console.log('aaaaaaaaa', attribute, this._propsAttributes[attribute]);
-                                        let execSetAttribute = () => this.el.dom.setAttribute(attribute, this._propsAttributes[attribute].map(item => {
+                                        //console.log(this._propsAttributes[attribute])
+                                        // mi serve a costruire il valore dell'attributo concatenando i risultati degli state con le eventuali stringhe presenti
+                                        let buildAttributeValue = () => this.el.dom.setAttribute(attribute, this._propsAttributes[attribute].map(item => {
                                             if (typeof item === 'function' && item.$$isState) {
                                                 return item()
                                             } else {
@@ -163,13 +164,14 @@ function destroy() {
                                             }
                                         }).join(''));
 
-                                        execSetAttribute();
+                                        buildAttributeValue();
 
                                         o.$$attributesStateListeners = [];
+                                        // per ogni state sottoscrivo un listener per ricostruire nuovamente il valore dell'attributo ad ogni cambiamento
                                         this._propsAttributes[attribute].forEach(item => {
                                             if (typeof item === 'function' && item.$$isState) {
                                                 o.$$attributesStateListeners.push(item.$$subscribe(value => {
-                                                    execSetAttribute();
+                                                    buildAttributeValue();
                                                 }));
                                             }
                                         });
@@ -266,24 +268,25 @@ const evaluate = (h, built, fields, args) => {
 			args[0] = value;
 		}
 		else if (type === PROPS_ASSIGN) {
-			console.log('f');
 			args[1] = Object.assign(args[1] || {}, value);
 		}
 		else if (type === PROP_SET) {
 			(args[1] = args[1] || {})[built[++i]] = value;
 		}
 		else if (type === PROP_APPEND) {
+			++i;
 			// support for array of prop
 			if (typeof value === "function" && value.$$isState) {
-				++i;
 				if (!Array.isArray(args[1][built[i]])) {
 					args[1][built[i]] = [args[1][built[i]]];
 					args[1][built[i]].$$hasState = true;
 				}
+			}
+
+			if (Array.isArray(args[1][built[i]])) {
 				args[1][built[i]].push(value);
-				//console.log(args[1][built[i]])
 			} else {
-				args[1][built[++i]] += (value + '');
+				args[1][built[i]] += (value + '');
 			}
 		}
 		else if (type) { // type === CHILD_RECURSE

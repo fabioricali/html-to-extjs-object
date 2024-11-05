@@ -41,8 +41,9 @@ export function defineExtClass(tag) {
                                     }
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
-                                        console.log('aaaaaaaaa', attribute, this._propsAttributes[attribute]);
-                                        let execSetAttribute = () => this.el.dom.setAttribute(attribute, this._propsAttributes[attribute].map(item => {
+                                        //console.log(this._propsAttributes[attribute])
+                                        // mi serve a costruire il valore dell'attributo concatenando i risultati degli state con le eventuali stringhe presenti
+                                        let buildAttributeValue = () => this.el.dom.setAttribute(attribute, this._propsAttributes[attribute].map(item => {
                                             if (typeof item === 'function' && item.$$isState) {
                                                 return item()
                                             } else {
@@ -50,13 +51,14 @@ export function defineExtClass(tag) {
                                             }
                                         }).join(''));
 
-                                        execSetAttribute();
+                                        buildAttributeValue();
 
                                         o.$$attributesStateListeners = [];
+                                        // per ogni state sottoscrivo un listener per ricostruire nuovamente il valore dell'attributo ad ogni cambiamento
                                         this._propsAttributes[attribute].forEach(item => {
                                             if (typeof item === 'function' && item.$$isState) {
                                                 o.$$attributesStateListeners.push(item.$$subscribe(value => {
-                                                    execSetAttribute();
+                                                    buildAttributeValue();
                                                 }))
                                             }
                                         })
