@@ -11,8 +11,8 @@
  * limitations under the License.
  */
 
-import { MINI } from './constants.mjs';
-import { build, evaluate } from './build.mjs';
+import { MINI } from './constants.js';
+import { build, evaluate } from './build.js';
 
 const CACHES = new Map();
 

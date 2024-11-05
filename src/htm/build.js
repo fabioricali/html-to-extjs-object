@@ -1,4 +1,4 @@
-import { MINI } from './constants.mjs';
+import { MINI } from './constants.js';
 
 const MODE_SLASH = 0;
 const MODE_TEXT = 1;

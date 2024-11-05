@@ -114,6 +114,7 @@ function applyPropsToConfig(config, props) {
 // Function to configure componentConfig based on children
 function configureChildren(config, children, type) {
     children.forEach(child => {
+        if (typeof child === 'undefined') return;
         if (child.xtype && columnTypes.includes(child.xtype)) {
             addToArray(config, 'columns', child);
         } else if (child.xtype === 'menu' && type === 'button') {
