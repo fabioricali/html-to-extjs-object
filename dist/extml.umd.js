@@ -1,4 +1,4 @@
-/* Extml, version: 2.4.1 - November 5, 2024 17:13:51 */
+/* Extml, version: 2.4.1 - November 5, 2024 17:34:15 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -169,7 +169,7 @@ function addEvent(componentConfig, eventObject) {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
                                 } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
-                                    this._propsAttributes[attribute].current = o.el.dom;
+                                    this._propsAttributes[attribute](o.el.dom);
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
@@ -543,7 +543,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop].current = o;
+                props[prop](o);
             }));
         } else if (prop === 'class') {
             config['cls'] = props[prop];
@@ -887,20 +887,24 @@ function h(strings, ...values) {
 //     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 // }
 function createRef(onChange) {
-    let _current = null;
+    let _value = null;
 
-    return {
-        $$isRef: true,
-        get current() {
-            return _current;
-        },
-        set current(value) {
-            _current = value;
+    function ref(value) {
+        if (arguments.length === 0) {
+            // Se non viene passato nessun valore, ritorna il valore corrente
+            return _value;
+        } else if (_value !== value) {
+            // Aggiorna solo se il valore cambia
+            _value = value;
             if (typeof onChange === "function") {
                 onChange(value);
             }
-        },
-    };
+        }
+    }
+
+    ref.$$isRef = true;
+
+    return ref;
 }try {
     if (window) {
         generateHtmlClass();
