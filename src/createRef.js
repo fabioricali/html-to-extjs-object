@@ -34,7 +34,7 @@ function createRef(onChange) {
                 }
             };
         }
-        throw new Error("Callback deve essere una funzione");
+        throw new Error("Listener must be a function");
     };
 
     return ref;
