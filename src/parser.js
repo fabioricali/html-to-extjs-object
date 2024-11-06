@@ -5,7 +5,8 @@ import {detectClassType} from "./detectClassType.js";
 
 export function _h(type, props, ...children) {
     if (type === 'style') {
-        return {isStyle: true, content: children[0] || ''}
+        //console.log(children)
+        return {isStyle: true, content: children}
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {

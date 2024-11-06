@@ -1,4 +1,4 @@
-export default function createEffect(effect, dependencies, runInitially = true) {
+export default function createEffect(effect, dependencies, runInitially = false) {
     if (typeof effect !== "function") {
         throw new Error("Effect must be a function");
     }

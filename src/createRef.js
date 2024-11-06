@@ -23,12 +23,12 @@ function createRef(onChange) {
     ref.$$isRef = true;
 
     // Metodo per aggiungere subscriber
-    ref.$$subscribe = function(callback) {
-        if (typeof callback === "function") {
-            subscribers.push(callback);
+    ref.$$subscribe = function(listener) {
+        if (typeof listener === "function") {
+            subscribers.push(listener);
             return () => {
                 // Restituisci una funzione di unsubscribe
-                const index = subscribers.indexOf(callback);
+                const index = subscribers.indexOf(listener);
                 if (index !== -1) {
                     subscribers.splice(index, 1);
                 }

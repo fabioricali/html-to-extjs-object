@@ -1,4 +1,4 @@
-/* Extml, version: 2.5.0 - November 5, 2024 22:45:40 */
+/* Extml, version: 2.5.0 - November 6, 2024 07:53:06 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -49,12 +49,42 @@ function createStyle() {
     let id = this.getId();
     let styleElement = document.createElement('style');
     styleElement.id = STYLE_PREFIX + id;
-    styleElement.innerHTML = composeStyleInner(this.stylesheet, '#' + id);
+
+    this.stylesheetStateListeners = [];
+    let stylesheet = '';
+    if (this.stylesheet.some(
+        (item) => typeof item === 'function' && item.$$isState === true
+    )) {
+        let stateItems = [];
+        let buildStyle = () => this.stylesheet.map(item => {
+            if (typeof item === 'function' && item.$$isState) {
+                stateItems.push(item);
+                return item()
+            } else {
+                return item
+            }
+        }).join('');
+
+        stylesheet = buildStyle();
+
+        stateItems.forEach(item => {
+            this.stylesheetStateListeners.push(item.$$subscribe(value => {
+                styleElement.innerHTML = composeStyleInner(buildStyle(), '#' + id);
+            }));
+        });
+    } else {
+        stylesheet = this.stylesheet.join('');
+    }
+
+    styleElement.innerHTML = composeStyleInner(stylesheet, '#' + id);
     document.head.appendChild(styleElement);
 }
 
 function destroyStyle() {
     if (!this.stylesheet) return;
+    if (this.stylesheetStateListeners) {
+        this.stylesheetStateListeners.forEach(listener => listener());
+    }
     document.getElementById(STYLE_PREFIX + this.getId()).remove();
 }function createContext() {
     Ext.getApplication().appContext = Ext.getApplication().appContext || {};
@@ -734,7 +764,8 @@ function createSetterName(attribute) {
 
 function _h(type, props, ...children) {
     if (type === 'style') {
-        return {isStyle: true, content: children[0] || ''}
+        //console.log(children)
+        return {isStyle: true, content: children}
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
@@ -911,12 +942,12 @@ function createRef(onChange) {
     ref.$$isRef = true;
 
     // Metodo per aggiungere subscriber
-    ref.$$subscribe = function(callback) {
-        if (typeof callback === "function") {
-            subscribers.push(callback);
+    ref.$$subscribe = function(listener) {
+        if (typeof listener === "function") {
+            subscribers.push(listener);
             return () => {
                 // Restituisci una funzione di unsubscribe
-                const index = subscribers.indexOf(callback);
+                const index = subscribers.indexOf(listener);
                 if (index !== -1) {
                     subscribers.splice(index, 1);
                 }
@@ -926,7 +957,7 @@ function createRef(onChange) {
     };
 
     return ref;
-}function createEffect(effect, dependencies, runInitially = true) {
+}function createEffect(effect, dependencies, runInitially = false) {
     if (typeof effect !== "function") {
         throw new Error("Effect must be a function");
     }

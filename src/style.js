@@ -48,11 +48,41 @@ export function createStyle() {
     let id = this.getId();
     let styleElement = document.createElement('style');
     styleElement.id = STYLE_PREFIX + id;
-    styleElement.innerHTML = composeStyleInner(this.stylesheet, '#' + id);
+
+    this.stylesheetStateListeners = [];
+    let stylesheet = ''
+    if (this.stylesheet.some(
+        (item) => typeof item === 'function' && item.$$isState === true
+    )) {
+        let stateItems = [];
+        let buildStyle = () => this.stylesheet.map(item => {
+            if (typeof item === 'function' && item.$$isState) {
+                stateItems.push(item);
+                return item()
+            } else {
+                return item
+            }
+        }).join('');
+
+        stylesheet = buildStyle()
+
+        stateItems.forEach(item => {
+            this.stylesheetStateListeners.push(item.$$subscribe(value => {
+                styleElement.innerHTML = composeStyleInner(buildStyle(), '#' + id);
+            }))
+        })
+    } else {
+        stylesheet = this.stylesheet.join('')
+    }
+
+    styleElement.innerHTML = composeStyleInner(stylesheet, '#' + id);
     document.head.appendChild(styleElement);
 }
 
 export function destroyStyle() {
     if (!this.stylesheet) return;
+    if (this.stylesheetStateListeners) {
+        this.stylesheetStateListeners.forEach(listener => listener());
+    }
     document.getElementById(STYLE_PREFIX + this.getId()).remove();
 }
