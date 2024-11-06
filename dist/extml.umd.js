@@ -1,4 +1,4 @@
-/* Extml, version: 2.5.0 - November 6, 2024 07:53:06 */
+/* Extml, version: 2.5.1 - November 6, 2024 09:40:58 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -953,7 +953,7 @@ function createRef(onChange) {
                 }
             };
         }
-        throw new Error("Callback deve essere una funzione");
+        throw new Error("Listener must be a function");
     };
 
     return ref;
@@ -961,17 +961,14 @@ function createRef(onChange) {
     if (typeof effect !== "function") {
         throw new Error("Effect must be a function");
     }
-    if (!Array.isArray(dependencies) || dependencies.some(dep => typeof dep.$$subscribe !== "function")) {
+    if (!Array.isArray(dependencies) || dependencies.some(dep => !dep || typeof dep.$$subscribe !== "function")) {
         throw new Error("Dependencies must be functions with the method $$subscribe");
     }
 
-    // Esegui l'effetto inizialmente se specificato
     if (runInitially) effect();
 
-    // Sottoscrivi le dipendenze e memorizza le funzioni di unsubscribe
     const unsubscribes = dependencies.map(dep => dep.$$subscribe(() => effect()));
 
-    // Restituisci una funzione di cleanup per annullare tutte le sottoscrizioni
     return () => unsubscribes.forEach(unsubscribe => unsubscribe());
 }try {
     if (window) {
