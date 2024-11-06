@@ -1,4 +1,4 @@
-/* Extml, version: 2.5.1 - November 6, 2024 09:40:58 */
+/* Extml, version: 2.6.0 - November 6, 2024 17:05:25 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -970,8 +970,17 @@ function createRef(onChange) {
     const unsubscribes = dependencies.map(dep => dep.$$subscribe(() => effect()));
 
     return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+}function createDerivedState(sourceState, transformer, ...args) {
+    const [derived, setDerived] = createState(transformer(sourceState(), ...args));
+
+    // Osserva cambiamenti nello stato di origine e aggiorna automaticamente quello derivato
+    sourceState.$$subscribe((newValue) => {
+        setDerived(transformer(newValue, ...args));
+    });
+
+    return derived;
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.createEffect=createEffect;exports.createRef=createRef;exports.createState=createState;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createRef=createRef;exports.createState=createState;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));

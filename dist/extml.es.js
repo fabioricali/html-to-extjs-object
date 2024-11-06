@@ -1,4 +1,4 @@
-/* Extml, version: 2.5.1 - November 6, 2024 09:40:58 */
+/* Extml, version: 2.6.0 - November 6, 2024 17:05:25 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -970,8 +970,17 @@ function createRef(onChange) {
     const unsubscribes = dependencies.map(dep => dep.$$subscribe(() => effect()));
 
     return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+}function createDerivedState(sourceState, transformer, ...args) {
+    const [derived, setDerived] = createState(transformer(sourceState(), ...args));
+
+    // Osserva cambiamenti nello stato di origine e aggiorna automaticamente quello derivato
+    sourceState.$$subscribe((newValue) => {
+        setDerived(transformer(newValue, ...args));
+    });
+
+    return derived;
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{createEffect,createRef,createState,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{createDerivedState,createEffect,createRef,createState,destroy,generateHtmlClass,h,initialize};
