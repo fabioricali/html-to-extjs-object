@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.0 - November 6, 2024 17:05:25 */
+/* Extml, version: 2.6.0 - November 6, 2024 18:07:39 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -685,11 +685,14 @@ function configureChildren(config, children, type) {
                 });
             } else {
                 let processedValue = processValueForHtml(child);
-
+                // console.log(children.length, processedValue, isPlainText(processedValue), children.some(
+                //     (item) => typeof item === 'function' && item.$$isState === true
+                // ))
+                // console.log(children)
                 // if there is some state in the children array it's better to use the html-x-html
-                if (isPlainText(processedValue) && children.some(
+                if (isPlainText(processedValue) && (children.length > 1 || children.some(
                     (item) => typeof item === 'function' && item.$$isState === true
-                )) {
+                ))) {
                     // create html text component
                     // console.log(processValueForHtml(child))
                     addToArray(config, 'items', {
@@ -701,7 +704,6 @@ function configureChildren(config, children, type) {
                         ]
                     });
                 } else {
-                    // console.log('html', child)
                     config.html = config.html || '';
                     config.html += processedValue;
                 }

@@ -330,4 +330,18 @@ describe('converts html to extjs object', function () {
         assert.equal(result.cell.xtype, 'widgetcell');
         assert.equal(result.cell.widget.items[0].xtype, 'button');
     });
+
+    it('#19, should have the right order', function () {
+        const [rangeStart] = createState(0)
+        const [rangeEnd] = createState(0)
+        const [rangeDuration] = createState(0)
+        let result = h`
+            <div style="margin-bottom: 20px">
+                Inizio: <strong>${rangeStart}</strong> Fine: <strong>${rangeEnd}</strong> Durata: <strong>${rangeDuration}</strong>
+            </div>
+        `;
+        console.log(JSON.stringify(result, null, 4))
+        // assert.equal(result.cell.xtype, 'widgetcell');
+        // assert.equal(result.cell.widget.items[0].xtype, 'button');
+    });
 })
