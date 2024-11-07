@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.2 - November 7, 2024 18:40:02 */
+/* Extml, version: 2.6.3 - November 7, 2024 18:40:42 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
