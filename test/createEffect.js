@@ -77,6 +77,21 @@ describe('createEffect', function () {
         assert.strictEqual(effectRunCount, 1);
     });
 
+    it('should execute `effect` when a nested object dependency property changes', function () {
+        let effectRunCount = 0;
+        const effect = () => { effectRunCount += 1; };
+        const dependency = { nested: { prop: 1 } };
+
+        const cleanup = createEffect(effect, [dependency], false);
+        const proxy = cleanup()[0];
+
+        assert.strictEqual(effectRunCount, 0);
+
+        // Change the nested property
+        proxy.nested.prop = 2;
+        assert.strictEqual(effectRunCount, 1);
+    });
+
     it('cleanup function should unsubscribe all dependencies', function () {
         let effectRunCount = 0;
         const effect = () => { effectRunCount += 1; };

@@ -16,10 +16,14 @@ export default function createEffect(effect, dependencies, runInitially = false)
             // Dependency is a reactive object with $$subscribe method
             return dep.$$subscribe(() => effect());
         } else if (typeof dep === "object" && dep !== null) {
-            // Dependency is a common object, watch its properties
+            // Dependency is a common object, watch its properties (including nested)
             const handler = {
                 set(target, property, value) {
-                    target[property] = value;
+                    if (typeof value === 'object' && value !== null) {
+                        target[property] = createProxy(value, handler);
+                    } else {
+                        target[property] = value;
+                    }
                     effect();
                     return true;
                 }
@@ -43,5 +47,12 @@ export default function createEffect(effect, dependencies, runInitially = false)
 }
 
 function createProxy(target, handler) {
-    return new Proxy(target, handler);
+    const proxy = new Proxy(target, handler);
+    // Recursively proxy nested objects
+    for (const key of Object.keys(target)) {
+        if (typeof target[key] === 'object' && target[key] !== null) {
+            target[key] = createProxy(target[key], handler);
+        }
+    }
+    return proxy;
 }
