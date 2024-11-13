@@ -95,4 +95,17 @@ describe('createEffect', function () {
         dependency.trigger();
         assert.strictEqual(effectRunCount, 1); // Should not be called again
     });
+
+    it('should execute callback when observed property changes', function () {
+        let callbackRunCount = 0;
+        const target = { nested: { prop: 1 } };
+        createPropertyObserver(target, 'nested.prop', () => { callbackRunCount += 1; });
+
+        assert.strictEqual(callbackRunCount, 0);
+
+        // Change the observed property
+        target.nested.prop = 2;
+        assert.strictEqual(callbackRunCount, 1);
+    });
+
 });

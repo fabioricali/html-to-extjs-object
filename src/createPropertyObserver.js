@@ -1,4 +1,4 @@
-export default function createPropertyObserver(target, path) {
+export default function createPropertyObserver(target, path, callback = null) {
     if (typeof target !== "object" || target === null) {
         throw new Error("Target must be an object");
     }
@@ -23,6 +23,7 @@ export default function createPropertyObserver(target, path) {
         set(newValue) {
             value = newValue;
             listeners.forEach(callback => callback());
+            if (callback) callback();
         },
         configurable: true,
         enumerable: true,
