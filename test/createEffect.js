@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import {createEffect} from "../src/index.js";
+import { createEffect } from "../src/index.js";
 
 // Mock for a dependency with the $$subscribe method
 function createMockDependency() {
@@ -25,7 +25,7 @@ describe('createEffect', function () {
     });
 
     it('should throw an error if `dependencies` is not an array of objects with $$subscribe', function () {
-        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be functions with the method \$\$subscribe/);
+        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be objects or functions with the method \$\$subscribe/);
     });
 
     it('should execute `effect` immediately if `runInitially` is true', function () {
@@ -59,6 +59,21 @@ describe('createEffect', function () {
 
         // Trigger the dependency
         dependency.trigger();
+        assert.strictEqual(effectRunCount, 1);
+    });
+
+    it('should execute `effect` when an object dependency property changes', function () {
+        let effectRunCount = 0;
+        const effect = () => { effectRunCount += 1; };
+        const dependency = { prop: 1 };
+
+        const cleanup = createEffect(effect, [dependency], false);
+        const proxy = cleanup()[0];
+
+        assert.strictEqual(effectRunCount, 0);
+
+        // Change the property
+        proxy.prop = 2;
         assert.strictEqual(effectRunCount, 1);
     });
 
