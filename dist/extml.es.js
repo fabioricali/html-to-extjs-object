@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.7 - November 13, 2024 16:51:53 */
+/* Extml, version: 2.6.8 - November 13, 2024 17:36:26 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -988,7 +988,7 @@ function createRef(onChange) {
             }
         });
     };
-}function createPropertyObserver(target, path) {
+}function createPropertyObserver(target, path, callback = null) {
     if (typeof target !== "object" || target === null) {
         throw new Error("Target must be an object");
     }
@@ -1011,8 +1011,10 @@ function createRef(onChange) {
             return value;
         },
         set(newValue) {
+            const oldValue = value;
             value = newValue;
-            listeners.forEach(callback => callback());
+            listeners.forEach(callback => callback(newValue, oldValue));
+            if (callback) callback(newValue, oldValue);
         },
         configurable: true,
         enumerable: true,
