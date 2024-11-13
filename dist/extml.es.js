@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.4 - November 13, 2024 15:59:56 */
+/* Extml, version: 2.6.5 - November 13, 2024 16:18:35 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -978,10 +978,14 @@ function createRef(onChange) {
             // Dependency is a reactive object with $$subscribe method
             return dep.$$subscribe(() => effect());
         } else if (typeof dep === "object" && dep !== null) {
-            // Dependency is a common object, watch its properties
+            // Dependency is a common object, watch its properties (including nested)
             const handler = {
                 set(target, property, value) {
-                    target[property] = value;
+                    if (typeof value === 'object' && value !== null) {
+                        target[property] = createProxy(value, handler);
+                    } else {
+                        target[property] = value;
+                    }
                     effect();
                     return true;
                 }
@@ -1005,7 +1009,14 @@ function createRef(onChange) {
 }
 
 function createProxy(target, handler) {
-    return new Proxy(target, handler);
+    const proxy = new Proxy(target, handler);
+    // Recursively proxy nested objects
+    for (const key of Object.keys(target)) {
+        if (typeof target[key] === 'object' && target[key] !== null) {
+            target[key] = createProxy(target[key], handler);
+        }
+    }
+    return proxy;
 }function createDerivedState(sourceState, transformer, ...args) {
     const [derived, setDerived] = createState(transformer(sourceState(), ...args));
 
