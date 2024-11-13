@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.3 - November 7, 2024 18:40:42 */
+/* Extml, version: 2.6.4 - November 13, 2024 15:59:56 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -964,15 +964,48 @@ function createRef(onChange) {
     if (typeof effect !== "function") {
         throw new Error("Effect must be a function");
     }
-    if (!Array.isArray(dependencies) || dependencies.some(dep => !dep || typeof dep.$$subscribe !== "function")) {
-        throw new Error("Dependencies must be functions with the method $$subscribe");
+
+    if (!Array.isArray(dependencies)) {
+        throw new Error("Dependencies must be an array");
     }
 
+    // Run the effect initially if requested
     if (runInitially) effect();
 
-    const unsubscribes = dependencies.map(dep => dep.$$subscribe(() => effect()));
+    const proxies = [];
+    const unsubscribes = dependencies.map(dep => {
+        if (dep && typeof dep.$$subscribe === "function") {
+            // Dependency is a reactive object with $$subscribe method
+            return dep.$$subscribe(() => effect());
+        } else if (typeof dep === "object" && dep !== null) {
+            // Dependency is a common object, watch its properties
+            const handler = {
+                set(target, property, value) {
+                    target[property] = value;
+                    effect();
+                    return true;
+                }
+            };
+            const proxy = createProxy(dep, handler);
+            proxies.push(proxy);
+            return null;
+        } else {
+            throw new Error("Dependencies must be objects or functions with the method $$subscribe");
+        }
+    });
 
-    return () => unsubscribes.forEach(unsubscribe => unsubscribe());
+    return () => {
+        unsubscribes.forEach(unsubscribe => {
+            if (typeof unsubscribe === "function") {
+                unsubscribe();
+            }
+        });
+        return proxies.length > 0 ? proxies : undefined;
+    };
+}
+
+function createProxy(target, handler) {
+    return new Proxy(target, handler);
 }function createDerivedState(sourceState, transformer, ...args) {
     const [derived, setDerived] = createState(transformer(sourceState(), ...args));
 
