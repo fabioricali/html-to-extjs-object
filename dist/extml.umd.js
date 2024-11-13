@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.6 - November 13, 2024 16:28:49 */
+/* Extml, version: 2.6.7 - November 13, 2024 16:51:53 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -972,61 +972,12 @@ function createRef(onChange) {
     // Run the effect initially if requested
     if (runInitially) effect();
 
-    const proxies = [];
     const unsubscribes = dependencies.map(dep => {
         if (dep && typeof dep.$$subscribe === "function") {
             // Dependency is a reactive object with $$subscribe method
             return dep.$$subscribe(() => effect());
-        } else if (typeof dep === "object" && dep !== null) {
-            // Dependency is a common object, watch its properties (including nested)
-            const handler = {
-                set(target, property, value) {
-                    if (typeof value === 'object' && value !== null) {
-                        target[property] = createProxy(value, handler);
-                    } else {
-                        target[property] = value;
-                    }
-                    effect();
-                    return true;
-                }
-            };
-            const proxy = createProxy(dep, handler);
-            proxies.push(proxy);
-            return null;
-        } else if (typeof dep === "string" && dep.includes('.')) {
-            // Dependency is a property path (e.g., 'myApp.USER_CONFIG')
-            const [root, ...path] = dep.split('.');
-            let target = globalThis[root];
-            for (let i = 0; i < path.length - 1; i++) {
-                target = target[path[i]];
-                if (typeof target !== "object" || target === null) {
-                    throw new Error("Invalid property path");
-                }
-            }
-            const prop = path[path.length - 1];
-            let originalValue = target[prop];
-            Object.defineProperty(target, prop, {
-                get() {
-                    return originalValue;
-                },
-                set(newValue) {
-                    originalValue = newValue;
-                    effect();
-                },
-                configurable: true,
-                enumerable: true,
-            });
-            return () => {
-                // Restore original property descriptor (optional clean-up)
-                Object.defineProperty(target, prop, {
-                    value: originalValue,
-                    writable: true,
-                    configurable: true,
-                    enumerable: true,
-                });
-            };
         } else {
-            throw new Error("Dependencies must be objects, functions with the method $$subscribe, or valid property paths");
+            throw new Error("Dependencies must be objects with the method $$subscribe");
         }
     });
 
@@ -1036,19 +987,46 @@ function createRef(onChange) {
                 unsubscribe();
             }
         });
-        return proxies.length > 0 ? proxies : undefined;
     };
-}
+}function createPropertyObserver(target, path) {
+    if (typeof target !== "object" || target === null) {
+        throw new Error("Target must be an object");
+    }
 
-function createProxy(target, handler) {
-    const proxy = new Proxy(target, handler);
-    // Recursively proxy nested objects
-    for (const key of Object.keys(target)) {
-        if (typeof target[key] === 'object' && target[key] !== null) {
-            target[key] = createProxy(target[key], handler);
+    const parts = path.split('.');
+    let current = target;
+    for (let i = 0; i < parts.length - 1; i++) {
+        current = current[parts[i]];
+        if (typeof current !== "object" || current === null) {
+            throw new Error(`Invalid property path: ${path}`);
         }
     }
-    return proxy;
+    const prop = parts[parts.length - 1];
+
+    const listeners = [];
+    let value = current[prop];
+
+    Object.defineProperty(current, prop, {
+        get() {
+            return value;
+        },
+        set(newValue) {
+            value = newValue;
+            listeners.forEach(callback => callback());
+        },
+        configurable: true,
+        enumerable: true,
+    });
+
+    return {
+        $$subscribe(callback) {
+            listeners.push(callback);
+            return () => {
+                const index = listeners.indexOf(callback);
+                if (index !== -1) listeners.splice(index, 1);
+            };
+        }
+    };
 }function createDerivedState(sourceState, transformer, ...args) {
     const [derived, setDerived] = createState(transformer(sourceState(), ...args));
 
@@ -1062,4 +1040,4 @@ function createProxy(target, handler) {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
