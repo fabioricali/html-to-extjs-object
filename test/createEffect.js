@@ -108,4 +108,21 @@ describe('createEffect', function () {
         assert.strictEqual(callbackRunCount, 1);
     });
 
+    it('should execute callback with old and new values when observed property changes', function () {
+        let oldValue, newValue;
+        const target = { nested: { prop: 1 } };
+        createPropertyObserver(target, 'nested.prop', (newVal, oldVal) => {
+            newValue = newVal;
+            oldValue = oldVal;
+        });
+
+        assert.strictEqual(newValue, undefined);
+        assert.strictEqual(oldValue, undefined);
+
+        // Change the observed property
+        target.nested.prop = 2;
+        assert.strictEqual(newValue, 2);
+        assert.strictEqual(oldValue, 1);
+    });
+
 });

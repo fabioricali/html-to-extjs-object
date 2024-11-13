@@ -21,9 +21,10 @@ export default function createPropertyObserver(target, path, callback = null) {
             return value;
         },
         set(newValue) {
+            const oldValue = value;
             value = newValue;
-            listeners.forEach(callback => callback());
-            if (callback) callback();
+            listeners.forEach(callback => callback(newValue, oldValue));
+            if (callback) callback(newValue, oldValue);
         },
         configurable: true,
         enumerable: true,
