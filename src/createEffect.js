@@ -31,8 +31,40 @@ export default function createEffect(effect, dependencies, runInitially = false)
             const proxy = createProxy(dep, handler);
             proxies.push(proxy);
             return null;
+        } else if (typeof dep === "string" && dep.includes('.')) {
+            // Dependency is a property path (e.g., 'myApp.USER_CONFIG')
+            const [root, ...path] = dep.split('.');
+            let target = globalThis[root];
+            for (let i = 0; i < path.length - 1; i++) {
+                target = target[path[i]];
+                if (typeof target !== "object" || target === null) {
+                    throw new Error("Invalid property path");
+                }
+            }
+            const prop = path[path.length - 1];
+            let originalValue = target[prop];
+            Object.defineProperty(target, prop, {
+                get() {
+                    return originalValue;
+                },
+                set(newValue) {
+                    originalValue = newValue;
+                    effect();
+                },
+                configurable: true,
+                enumerable: true,
+            });
+            return () => {
+                // Restore original property descriptor (optional clean-up)
+                Object.defineProperty(target, prop, {
+                    value: originalValue,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true,
+                });
+            };
         } else {
-            throw new Error("Dependencies must be objects or functions with the method $$subscribe");
+            throw new Error("Dependencies must be objects, functions with the method $$subscribe, or valid property paths");
         }
     });
 

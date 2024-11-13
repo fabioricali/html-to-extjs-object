@@ -1,3 +1,4 @@
+// Tests
 import assert from 'node:assert';
 import { createEffect } from "../src/index.js";
 
@@ -24,8 +25,8 @@ describe('createEffect', function () {
         assert.throws(() => createEffect(null, []), /Effect must be a function/);
     });
 
-    it('should throw an error if `dependencies` is not an array of objects with $$subscribe', function () {
-        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be objects or functions with the method \$\$subscribe/);
+    it('should throw an error if `dependencies` is not an array of objects, functions with the method $$subscribe, or valid property paths', function () {
+        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be objects, functions with the method \$\$subscribe, or valid property paths/);
     });
 
     it('should execute `effect` immediately if `runInitially` is true', function () {
@@ -89,6 +90,20 @@ describe('createEffect', function () {
 
         // Change the nested property
         proxy.nested.prop = 2;
+        assert.strictEqual(effectRunCount, 1);
+    });
+
+    it('should execute `effect` when a specific property path changes', function () {
+        let effectRunCount = 0;
+        const effect = () => { effectRunCount += 1; };
+        globalThis.myApp = { USER_CONFIG: { theme: 'light' } };
+
+        const cleanup = createEffect(effect, ['myApp.USER_CONFIG.theme'], false);
+
+        assert.strictEqual(effectRunCount, 0);
+
+        // Change the property
+        globalThis.myApp.USER_CONFIG.theme = 'dark';
         assert.strictEqual(effectRunCount, 1);
     });
 
