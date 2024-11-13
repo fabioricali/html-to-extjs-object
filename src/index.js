@@ -4,8 +4,9 @@ import {h} from "./parser.js";
 import {createState} from "./createState.js";
 import createRef from "./createRef.js";
 import createEffect from "./createEffect.js";
+import createPropertyObserver from "./createPropertyObserver.js";
 import createDerivedState from "./createDerivedState.js";
-export {h, generateHtmlClass, initialize, destroy, createState, createRef, createEffect, createDerivedState, defineExtClass};
+export {h, generateHtmlClass, initialize, destroy, createState, createRef, createEffect, createDerivedState, defineExtClass, createPropertyObserver};
 
 try {
     if (window) {

@@ -1,6 +1,5 @@
-// Tests
 import assert from 'node:assert';
-import { createEffect } from "../src/index.js";
+import { createEffect, createPropertyObserver } from "../src/index.js";
 
 // Mock for a dependency with the $$subscribe method
 function createMockDependency() {
@@ -25,8 +24,8 @@ describe('createEffect', function () {
         assert.throws(() => createEffect(null, []), /Effect must be a function/);
     });
 
-    it('should throw an error if `dependencies` is not an array of objects, functions with the method $$subscribe, or valid property paths', function () {
-        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be objects, functions with the method \$\$subscribe, or valid property paths/);
+    it('should throw an error if `dependencies` is not an array of objects with $$subscribe', function () {
+        assert.throws(() => createEffect(() => {}, [null]), /Dependencies must be objects with the method \$\$subscribe/);
     });
 
     it('should execute `effect` immediately if `runInitially` is true', function () {
@@ -63,47 +62,18 @@ describe('createEffect', function () {
         assert.strictEqual(effectRunCount, 1);
     });
 
-    it('should execute `effect` when an object dependency property changes', function () {
+    it('should execute `effect` when an observed object property changes', function () {
         let effectRunCount = 0;
         const effect = () => { effectRunCount += 1; };
-        const dependency = { prop: 1 };
+        const target = { nested: { prop: 1 } };
+        const observedDependency = createPropertyObserver(target, 'nested.prop');
 
-        const cleanup = createEffect(effect, [dependency], false);
-        const proxy = cleanup()[0];
+        createEffect(effect, [observedDependency], false);
 
         assert.strictEqual(effectRunCount, 0);
 
-        // Change the property
-        proxy.prop = 2;
-        assert.strictEqual(effectRunCount, 1);
-    });
-
-    it('should execute `effect` when a nested object dependency property changes', function () {
-        let effectRunCount = 0;
-        const effect = () => { effectRunCount += 1; };
-        const dependency = { nested: { prop: 1 } };
-
-        const cleanup = createEffect(effect, [dependency], false);
-        const proxy = cleanup()[0];
-
-        assert.strictEqual(effectRunCount, 0);
-
-        // Change the nested property
-        proxy.nested.prop = 2;
-        assert.strictEqual(effectRunCount, 1);
-    });
-
-    it('should execute `effect` when a specific property path changes', function () {
-        let effectRunCount = 0;
-        const effect = () => { effectRunCount += 1; };
-        globalThis.myApp = { USER_CONFIG: { theme: 'light' } };
-
-        const cleanup = createEffect(effect, ['myApp.USER_CONFIG.theme'], false);
-
-        assert.strictEqual(effectRunCount, 0);
-
-        // Change the property
-        globalThis.myApp.USER_CONFIG.theme = 'dark';
+        // Change the observed property
+        target.nested.prop = 2;
         assert.strictEqual(effectRunCount, 1);
     });
 
