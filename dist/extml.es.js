@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.8 - November 13, 2024 17:36:26 */
+/* Extml, version: 2.6.8 - November 14, 2024 10:37:43 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -173,7 +173,7 @@ function destroy() {
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (typeof this._propsAttributes[attribute] === 'function' && this._propsAttributes[attribute].$$isState) {
+                                if (typeof this._propsAttributes[attribute] === 'function' /*&& this._propsAttributes[attribute].$$isState*/) {
                                     if (this._propsAttributes[attribute].$$isState) {
                                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                                         // console.log(attribute)
@@ -210,7 +210,6 @@ function destroy() {
                                         });
 
                                     } else {
-                                        // console.log(attribute)
                                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]));
                                     }
                                 }
