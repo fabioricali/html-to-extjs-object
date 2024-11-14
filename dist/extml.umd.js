@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.10 - November 14, 2024 11:02:06 */
+/* Extml, version: 2.6.10 - November 14, 2024 11:18:41 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -175,15 +175,13 @@ function destroy() {
                             Object.keys(this._propsAttributes).forEach(attribute => {
                                 if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
                                     this._propsAttributes[attribute](o.el.dom);
-                                } else if (typeof this._propsAttributes[attribute] === 'function' /*&& this._propsAttributes[attribute].$$isState*/) {
-                                    if (this._propsAttributes[attribute].$$isState) {
-                                        this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
-                                        o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
-                                            this.el.dom.setAttribute(attribute, String(value));
-                                        });
-                                    } else {
-                                        this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
-                                    }
+                                } else if (this._propsAttributes[attribute] &&  this._propsAttributes[attribute].$$isState) {
+                                    this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
+                                    o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
+                                        this.el.dom.setAttribute(attribute, String(value));
+                                    });
+                                } else if (attribute.startsWith('on') && typeof this._propsAttributes[attribute] === 'function') {
+                                    this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
