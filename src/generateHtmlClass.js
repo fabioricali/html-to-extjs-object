@@ -29,18 +29,17 @@ export function defineExtClass(tag) {
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (typeof this._propsAttributes[attribute] === 'function' /*&& this._propsAttributes[attribute].$$isState*/) {
+                                if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
+                                    this._propsAttributes[attribute](o.el.dom)
+                                } else if (typeof this._propsAttributes[attribute] === 'function' /*&& this._propsAttributes[attribute].$$isState*/) {
                                     if (this._propsAttributes[attribute].$$isState) {
                                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
-                                        // console.log(attribute)
                                         o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                                             this.el.dom.setAttribute(attribute, String(value));
                                         })
                                     } else {
                                         this.el.dom.addEventListener(attribute.substring(2), this._propsAttributes[attribute]);
                                     }
-                                } else if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
-                                    this._propsAttributes[attribute](o.el.dom)
                                 } else {
                                     if (Array.isArray(this._propsAttributes[attribute]) && this._propsAttributes[attribute].$$hasState) {
                                         //console.log(this._propsAttributes[attribute])
