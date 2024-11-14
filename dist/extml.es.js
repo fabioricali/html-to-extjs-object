@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.11 - November 14, 2024 11:20:32 */
+/* Extml, version: 2.6.11 - November 14, 2024 11:23:04 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -173,9 +173,9 @@ function destroy() {
                         this.innerElement.dom.className = '';
                         if (this._propsAttributes) {
                             Object.keys(this._propsAttributes).forEach(attribute => {
-                                if (attribute === 'ref' && this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isRef) {
+                                if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
                                     this._propsAttributes[attribute](o.el.dom);
-                                } else if (this._propsAttributes[attribute] &&  this._propsAttributes[attribute].$$isState) {
+                                } else if (this._propsAttributes[attribute].$$isState) {
                                     this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                                     o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                                         this.el.dom.setAttribute(attribute, String(value));
