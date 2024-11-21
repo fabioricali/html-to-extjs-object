@@ -1,4 +1,4 @@
-/* Extml, version: 2.7.0 - November 21, 2024 17:04:11 */
+/* Extml, version: 2.7.1 - November 21, 2024 17:06:31 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1034,14 +1034,14 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For({ each, func }) {
+}function For({ each, effect }) {
     function onInitialize(component) {
         let currentItems = [];
 
         const updateChildren = (newItems) => {
             newItems.forEach((item, index) => {
                 if (!currentItems[index] || !deepEqual(currentItems[index], item)) {
-                    const child = func(item, index);
+                    const child = effect(item, index);
                     if (component.items.getAt(index)) {
                         component.removeAt(index);
                         component.insert(index, child);
