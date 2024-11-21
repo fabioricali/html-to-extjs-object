@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.12 - November 21, 2024 08:18:36 */
+/* Extml, version: 2.6.12 - November 21, 2024 08:40:54 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1034,9 +1034,14 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For(props) {
-    console.log(props);
-    return h`<ext-container></ext-container>`
+}function For({each, func}) {
+    function onInitialize(component) {
+        console.log(each);
+        console.log(func);
+        component.add(func());
+    }
+
+    return h`<ext-container oninitialize="${onInitialize}"></ext-container>`
 }try {
     if (window) {
         generateHtmlClass();
