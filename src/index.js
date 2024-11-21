@@ -6,7 +6,8 @@ import createRef from "./createRef.js";
 import createEffect from "./createEffect.js";
 import createPropertyObserver from "./createPropertyObserver.js";
 import createDerivedState from "./createDerivedState.js";
-export {h, generateHtmlClass, initialize, destroy, createState, createRef, createEffect, createDerivedState, defineExtClass, createPropertyObserver};
+import {For} from "./For.js";
+export {h, generateHtmlClass, initialize, destroy, createState, createRef, createEffect, createDerivedState, defineExtClass, createPropertyObserver, For};
 
 try {
     if (window) {

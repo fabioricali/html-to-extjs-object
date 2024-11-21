@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.12 - November 14, 2024 11:24:23 */
+/* Extml, version: 2.6.12 - November 21, 2024 08:18:36 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1034,8 +1034,11 @@ function createRef(onChange) {
     });
 
     return derived;
+}function For(props) {
+    console.log(props);
+    return h`<ext-container></ext-container>`
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{createDerivedState,createEffect,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{For,createDerivedState,createEffect,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize};

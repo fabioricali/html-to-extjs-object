@@ -1,4 +1,4 @@
-/* Extml, version: 2.6.12 - November 14, 2024 11:24:23 */
+/* Extml, version: 2.6.12 - November 21, 2024 08:18:36 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1034,8 +1034,11 @@ function createRef(onChange) {
     });
 
     return derived;
+}function For(props) {
+    console.log(props);
+    return h`<ext-container></ext-container>`
 }try {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.For=For;exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
