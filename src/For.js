@@ -1,13 +1,13 @@
 import {h} from "./parser.js";
 
-export function For({ each, func }) {
+export function For({ each, effect }) {
     function onInitialize(component) {
         let currentItems = [];
 
         const updateChildren = (newItems) => {
             newItems.forEach((item, index) => {
                 if (!currentItems[index] || !deepEqual(currentItems[index], item)) {
-                    const child = func(item, index);
+                    const child = effect(item, index);
                     if (component.items.getAt(index)) {
                         component.removeAt(index);
                         component.insert(index, child);
