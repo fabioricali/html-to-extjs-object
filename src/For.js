@@ -6,35 +6,32 @@ export function For({ each, effect }) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
         const updateChildren = (newItems) => {
+            const newStateMap = new Map(); // Nuova mappa per gli stati aggiornati
+
+            // Rigenera sempre tutti gli elementi
             newItems.forEach((item, index) => {
-                let child;
+                const state = childStateMap.get(index) || {};
+                newStateMap.set(index, state);
 
-                // Inizializza uno stato locale per il figlio, se non esiste
-                if (!childStateMap.has(index)) {
-                    childStateMap.set(index, {});
-                }
-                const state = childStateMap.get(index);
-
-                if (!currentItems[index] || !deepEqual(currentItems[index], item)) {
-                    // Genera il figlio utilizzando l'effetto
-                    child = effect(item, index, state);
-
-                    if (component.items.getAt(index)) {
-                        component.removeAt(index);
-                        component.insert(index, child);
-                    } else {
-                        component.add(child);
-                    }
+                const child = effect(item, index, state); // Genera il figlio
+                if (component.items.getAt(index)) {
+                    component.removeAt(index);
+                    component.insert(index, child);
+                } else {
+                    component.add(child);
                 }
             });
 
-            // Rimuove i componenti extra e pulisce gli stati
+            // Rimuove eventuali elementi extra
             while (component.items.length > newItems.length) {
-                const removedIndex = component.items.length - 1;
-                component.removeAt(removedIndex);
-                childStateMap.delete(removedIndex);
+                component.removeAt(component.items.length - 1);
             }
 
+            // Aggiorna la mappa degli stati e gli elementi correnti
+            childStateMap.clear();
+            for (const [key, value] of newStateMap.entries()) {
+                childStateMap.set(key, value);
+            }
             currentItems = newItems;
         };
 
@@ -53,20 +50,20 @@ export function For({ each, effect }) {
 
 
 // Utility function for deep comparison
-function deepEqual(a, b) {
-    if (a === b) return true;
-
-    if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
-        const keysA = Object.keys(a);
-        const keysB = Object.keys(b);
-
-        if (keysA.length !== keysB.length) return false;
-
-        return keysA.every(key => deepEqual(a[key], b[key]));
-    }
-
-    return false;
-}
+// function deepEqual(a, b) {
+//     if (a === b) return true;
+//
+//     if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
+//         const keysA = Object.keys(a);
+//         const keysB = Object.keys(b);
+//
+//         if (keysA.length !== keysB.length) return false;
+//
+//         return keysA.every(key => deepEqual(a[key], b[key]));
+//     }
+//
+//     return false;
+// }
 
 // export function For({ each, func }) {
 //     function onInitialize(component) {
