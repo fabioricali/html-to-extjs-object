@@ -24,7 +24,7 @@ export function defineExtClass(tag) {
         __initializeHack(o) {
             {
                 if (this.__initializeHackAttempts > 100) {
-                    console.warn('this.el.dom not found')
+                    console.warn('this.el.dom not found', this)
                     return;
                 }
                 if (!this.el || !this.el.dom ) {
