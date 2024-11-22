@@ -23,8 +23,8 @@ export function defineExtClass(tag) {
         __initializeHackAttempts: 0,
         __initializeHack(o) {
             {
-                if (this.__initializeHackAttempts > 100) {
-                    console.warn('this.el.dom not found', this)
+                if (this.__initializeHackAttempts > 2) {
+                    // console.warn('this.el.dom not found', this)
                     return;
                 }
                 if (!this.el || !this.el.dom ) {
