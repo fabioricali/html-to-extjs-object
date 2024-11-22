@@ -1,96 +1,101 @@
-export function createState(initialValue, treatAsSingleEntity = false) {
+const stateCache = new WeakMap(); // Cache globale per stati persistenti
+
+export function createState(initialValue, context = null, treatAsSingleEntity = false) {
+    // Helper per gestire la persistenza opzionale
+    const getPersistentState = (context, valueInitializer) => {
+        if (!stateCache.has(context)) {
+            stateCache.set(context, valueInitializer());
+        }
+        return stateCache.get(context);
+    };
+
+    // Gestione della persistenza
+    if (context) {
+        return getPersistentState(context, () => {
+            return createState(initialValue, null, treatAsSingleEntity);
+        });
+    }
+
+    // Logica standard per creare lo stato
     let isObject = typeof initialValue === 'object' && initialValue !== null && !Array.isArray(initialValue) && !(initialValue instanceof Date) && !treatAsSingleEntity;
     let state = isObject ? { ...initialValue } : initialValue;
     const globalListeners = new Set();
-
-    // Crea un set di listener per ogni proprietà se lo stato è un oggetto
     const propertyListeners = isObject
         ? Object.fromEntries(Object.keys(state).map(key => [key, new Set()]))
         : null;
 
-    // Funzione per iscriversi ai cambiamenti globali di stato
     const subscribe = (listener) => {
         globalListeners.add(listener);
-        return () => globalListeners.delete(listener); // Ritorna una funzione per rimuovere l'observer globale
+        return () => globalListeners.delete(listener);
     };
 
-    // Funzione getter generale
     const getState = () => state;
     getState.$$isState = true;
     getState.$$subscribe = subscribe;
 
-    // Creazione di getter e setter specifici per ogni proprietà
-    const stateGetters = isObject
-        ? Object.fromEntries(
-            Object.keys(state).map((key) => {
-                const propertyGetter = () => state[key];
-                propertyGetter.$$isState = true;
-
-                // Subscribe specifico per la proprietà
-                propertyGetter.$$subscribe = (listener) => {
-                    propertyListeners[key].add(listener);
-                    return () => propertyListeners[key].delete(listener); // Rimuove l'observer della proprietà
-                };
-
-                return [key, propertyGetter];
-            })
-        )
-        : getState;
-
-    // Funzione setter generale per aggiornare lo stato
     const setState = (newValue) => {
         if (Array.isArray(initialValue)) {
             if (!arraysEqual(state, newValue)) {
                 state = [...newValue];
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else if (initialValue instanceof Date) {
             if (state.getTime() !== newValue.getTime()) {
                 state = new Date(newValue);
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else if (isObject) {
             let hasChanges = false;
             const newState = { ...state };
 
-            Object.keys(newValue).forEach((key) => {
+            Object.keys(newValue).forEach(key => {
                 if (newValue[key] !== state[key]) {
                     newState[key] = newValue[key];
                     hasChanges = true;
-                    // Notifica solo i listener della proprietà specifica
-                    propertyListeners[key].forEach((listener) => listener(newState[key]));
+                    propertyListeners[key].forEach(listener => listener(newState[key]));
                 }
             });
 
             if (hasChanges) {
                 state = newState;
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else {
             if (newValue !== state) {
                 state = newValue;
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         }
     };
 
-    // Funzione di utilità per confrontare array
-    const arraysEqual = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
-
     // Creazione di setter specifici per ogni proprietà
     if (isObject) {
-        Object.keys(state).forEach((key) => {
+        Object.keys(state).forEach(key => {
             setState[key] = (newValue) => {
                 if (state[key] !== newValue) {
                     state = { ...state, [key]: newValue };
-                    // Notifica solo i listener della proprietà specifica
-                    propertyListeners[key].forEach((listener) => listener(state[key]));
-                    // Notifica i listener globali dell'intero stato aggiornato
-                    globalListeners.forEach((listener) => listener(state));
+                    propertyListeners[key].forEach(listener => listener(state[key]));
+                    globalListeners.forEach(listener => listener(state));
                 }
             };
         });
     }
+
+    const arraysEqual = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
+
+    const stateGetters = isObject
+        ? Object.fromEntries(
+            Object.keys(state).map(key => {
+                const propertyGetter = () => state[key];
+                propertyGetter.$$isState = true;
+                propertyGetter.$$subscribe = listener => {
+                    propertyListeners[key].add(listener);
+                    return () => propertyListeners[key].delete(listener);
+                };
+                return [key, propertyGetter];
+            })
+        )
+        : getState;
 
     return [isObject ? stateGetters : getState, setState, subscribe];
 }

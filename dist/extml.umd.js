@@ -1,4 +1,4 @@
-/* Extml, version: 2.8.0 - November 21, 2024 17:09:48 */
+/* Extml, version: 2.8.0 - November 22, 2024 12:30:34 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -795,99 +795,104 @@ function h(strings, ...values) {
         parsed.isContext = true;
     }
     return parsed
-}function createState(initialValue, treatAsSingleEntity = false) {
+}const stateCache = new WeakMap(); // Cache globale per stati persistenti
+
+function createState(initialValue, context = null, treatAsSingleEntity = false) {
+    // Helper per gestire la persistenza opzionale
+    const getPersistentState = (context, valueInitializer) => {
+        if (!stateCache.has(context)) {
+            stateCache.set(context, valueInitializer());
+        }
+        return stateCache.get(context);
+    };
+
+    // Gestione della persistenza
+    if (context) {
+        return getPersistentState(context, () => {
+            return createState(initialValue, null, treatAsSingleEntity);
+        });
+    }
+
+    // Logica standard per creare lo stato
     let isObject = typeof initialValue === 'object' && initialValue !== null && !Array.isArray(initialValue) && !(initialValue instanceof Date) && !treatAsSingleEntity;
     let state = isObject ? { ...initialValue } : initialValue;
     const globalListeners = new Set();
-
-    // Crea un set di listener per ogni proprietà se lo stato è un oggetto
     const propertyListeners = isObject
         ? Object.fromEntries(Object.keys(state).map(key => [key, new Set()]))
         : null;
 
-    // Funzione per iscriversi ai cambiamenti globali di stato
     const subscribe = (listener) => {
         globalListeners.add(listener);
-        return () => globalListeners.delete(listener); // Ritorna una funzione per rimuovere l'observer globale
+        return () => globalListeners.delete(listener);
     };
 
-    // Funzione getter generale
     const getState = () => state;
     getState.$$isState = true;
     getState.$$subscribe = subscribe;
 
-    // Creazione di getter e setter specifici per ogni proprietà
-    const stateGetters = isObject
-        ? Object.fromEntries(
-            Object.keys(state).map((key) => {
-                const propertyGetter = () => state[key];
-                propertyGetter.$$isState = true;
-
-                // Subscribe specifico per la proprietà
-                propertyGetter.$$subscribe = (listener) => {
-                    propertyListeners[key].add(listener);
-                    return () => propertyListeners[key].delete(listener); // Rimuove l'observer della proprietà
-                };
-
-                return [key, propertyGetter];
-            })
-        )
-        : getState;
-
-    // Funzione setter generale per aggiornare lo stato
     const setState = (newValue) => {
         if (Array.isArray(initialValue)) {
             if (!arraysEqual(state, newValue)) {
                 state = [...newValue];
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else if (initialValue instanceof Date) {
             if (state.getTime() !== newValue.getTime()) {
                 state = new Date(newValue);
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else if (isObject) {
             let hasChanges = false;
             const newState = { ...state };
 
-            Object.keys(newValue).forEach((key) => {
+            Object.keys(newValue).forEach(key => {
                 if (newValue[key] !== state[key]) {
                     newState[key] = newValue[key];
                     hasChanges = true;
-                    // Notifica solo i listener della proprietà specifica
-                    propertyListeners[key].forEach((listener) => listener(newState[key]));
+                    propertyListeners[key].forEach(listener => listener(newState[key]));
                 }
             });
 
             if (hasChanges) {
                 state = newState;
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         } else {
             if (newValue !== state) {
                 state = newValue;
-                globalListeners.forEach((listener) => listener(state));
+                globalListeners.forEach(listener => listener(state));
             }
         }
     };
 
-    // Funzione di utilità per confrontare array
-    const arraysEqual = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
-
     // Creazione di setter specifici per ogni proprietà
     if (isObject) {
-        Object.keys(state).forEach((key) => {
+        Object.keys(state).forEach(key => {
             setState[key] = (newValue) => {
                 if (state[key] !== newValue) {
                     state = { ...state, [key]: newValue };
-                    // Notifica solo i listener della proprietà specifica
-                    propertyListeners[key].forEach((listener) => listener(state[key]));
-                    // Notifica i listener globali dell'intero stato aggiornato
-                    globalListeners.forEach((listener) => listener(state));
+                    propertyListeners[key].forEach(listener => listener(state[key]));
+                    globalListeners.forEach(listener => listener(state));
                 }
             };
         });
     }
+
+    const arraysEqual = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
+
+    const stateGetters = isObject
+        ? Object.fromEntries(
+            Object.keys(state).map(key => {
+                const propertyGetter = () => state[key];
+                propertyGetter.$$isState = true;
+                propertyGetter.$$subscribe = listener => {
+                    propertyListeners[key].add(listener);
+                    return () => propertyListeners[key].delete(listener);
+                };
+                return [key, propertyGetter];
+            })
+        )
+        : getState;
 
     return [isObject ? stateGetters : getState, setState, subscribe];
 }
@@ -1037,11 +1042,22 @@ function createRef(onChange) {
 }function For({ each, effect }) {
     function onInitialize(component) {
         let currentItems = [];
+        const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
         const updateChildren = (newItems) => {
             newItems.forEach((item, index) => {
+                let child;
+
+                // Inizializza uno stato locale per il figlio, se non esiste
+                if (!childStateMap.has(index)) {
+                    childStateMap.set(index, {});
+                }
+                const state = childStateMap.get(index);
+
                 if (!currentItems[index] || !deepEqual(currentItems[index], item)) {
-                    const child = effect(item, index);
+                    // Genera il figlio utilizzando l'effetto
+                    child = effect(item, index, state);
+
                     if (component.items.getAt(index)) {
                         component.removeAt(index);
                         component.insert(index, child);
@@ -1051,8 +1067,11 @@ function createRef(onChange) {
                 }
             });
 
+            // Rimuove i componenti extra e pulisce gli stati
             while (component.items.length > newItems.length) {
-                component.removeAt(newItems.length);
+                const removedIndex = component.items.length - 1;
+                component.removeAt(removedIndex);
+                childStateMap.delete(removedIndex);
             }
 
             currentItems = newItems;
@@ -1070,6 +1089,7 @@ function createRef(onChange) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 // Utility function for deep comparison
 function deepEqual(a, b) {

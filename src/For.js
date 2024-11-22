@@ -3,11 +3,22 @@ import {h} from "./parser.js";
 export function For({ each, effect }) {
     function onInitialize(component) {
         let currentItems = [];
+        const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
         const updateChildren = (newItems) => {
             newItems.forEach((item, index) => {
+                let child;
+
+                // Inizializza uno stato locale per il figlio, se non esiste
+                if (!childStateMap.has(index)) {
+                    childStateMap.set(index, {});
+                }
+                const state = childStateMap.get(index);
+
                 if (!currentItems[index] || !deepEqual(currentItems[index], item)) {
-                    const child = effect(item, index);
+                    // Genera il figlio utilizzando l'effetto
+                    child = effect(item, index, state);
+
                     if (component.items.getAt(index)) {
                         component.removeAt(index);
                         component.insert(index, child);
@@ -17,8 +28,11 @@ export function For({ each, effect }) {
                 }
             });
 
+            // Rimuove i componenti extra e pulisce gli stati
             while (component.items.length > newItems.length) {
-                component.removeAt(newItems.length);
+                const removedIndex = component.items.length - 1;
+                component.removeAt(removedIndex);
+                childStateMap.delete(removedIndex);
             }
 
             currentItems = newItems;
@@ -36,6 +50,7 @@ export function For({ each, effect }) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 // Utility function for deep comparison
 function deepEqual(a, b) {

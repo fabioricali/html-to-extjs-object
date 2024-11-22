@@ -114,4 +114,24 @@ describe('createState', function () {
         setMyDate(newDate);
         assert.equal(myDate().getTime(), newDate.getTime());
     });
+
+    it('should allow persistent state using a context', function () {
+        const context = {}; // Contesto unico
+
+        const [state1, setState1] = createState(0, context);
+
+        setState1(42);
+
+        const [state2] = createState(0, context);
+
+        assert.strictEqual(state1(), 42);
+        assert.strictEqual(state2(), 42);
+
+        setState1(100);
+        assert.strictEqual(state2(), 100);
+
+        const [state3] = createState(0, {});
+        assert.strictEqual(state3(), 0); // Stato isolato
+    });
+
 });
