@@ -1,4 +1,4 @@
-/* Extml, version: 2.11.0 - November 22, 2024 18:04:28 */
+/* Extml, version: 2.11.0 - November 22, 2024 18:17:51 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1053,7 +1053,7 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For({ each, effect }) {
+}function For({ each, effect, getKey = (item) => item.id || item.name }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
@@ -1062,8 +1062,9 @@ function createRef(onChange) {
 
             // Rigenera sempre tutti gli elementi
             newItems.forEach((item, index) => {
-                const state = childStateMap.get(index) || {};
-                newStateMap.set(index, state);
+                const key = getKey(item); // Ottieni una chiave univoca per ogni elemento
+                const state = childStateMap.get(key) || {};
+                newStateMap.set(key, state);
 
                 const child = effect(item, index, state); // Genera il figlio
                 if (component.items.getAt(index)) {
@@ -1098,6 +1099,7 @@ function createRef(onChange) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 
 

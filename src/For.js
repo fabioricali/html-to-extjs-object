@@ -1,6 +1,6 @@
 import {h} from "./parser.js";
 
-export function For({ each, effect }) {
+export function For({ each, effect, getKey = (item) => item.id || item.name }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
@@ -9,8 +9,9 @@ export function For({ each, effect }) {
 
             // Rigenera sempre tutti gli elementi
             newItems.forEach((item, index) => {
-                const state = childStateMap.get(index) || {};
-                newStateMap.set(index, state);
+                const key = getKey(item); // Ottieni una chiave univoca per ogni elemento
+                const state = childStateMap.get(key) || {};
+                newStateMap.set(key, state);
 
                 const child = effect(item, index, state); // Genera il figlio
                 if (component.items.getAt(index)) {
@@ -45,6 +46,7 @@ export function For({ each, effect }) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 
 
