@@ -1,4 +1,4 @@
-/* Extml, version: 2.12.0 - November 22, 2024 18:27:07 */
+/* Extml, version: 2.12.0 - November 22, 2024 22:09:23 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -845,6 +845,9 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
     getState.$$subscribe = subscribe;
 
     const setState = (newValue) => {
+        if (typeof newValue === "function") {
+            newValue = newValue(state);
+        }
         if (Array.isArray(initialValue)) {
             if (!arraysEqual(state, newValue)) {
                 state = [...newValue];

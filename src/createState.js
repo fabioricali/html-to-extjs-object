@@ -34,6 +34,9 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
     getState.$$subscribe = subscribe;
 
     const setState = (newValue) => {
+        if (typeof newValue === "function") {
+            newValue = newValue(state)
+        }
         if (Array.isArray(initialValue)) {
             if (!arraysEqual(state, newValue)) {
                 state = [...newValue];

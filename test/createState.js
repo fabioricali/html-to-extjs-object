@@ -11,6 +11,20 @@ describe('createState', function () {
         assert.equal(myState(), 10);
     });
 
+    it('should create a state with a single value updated via callback', function () {
+        const [myState, setMyState] = createState(0);
+        assert.equal(myState(), 0);
+
+        setMyState(currentState => currentState + 2);
+        assert.equal(myState(), 2);
+
+        setMyState(currentState => currentState + 3);
+        assert.equal(myState(), 5);
+
+        setMyState(currentState => currentState + 5);
+        assert.equal(myState(), 10);
+    });
+
     it('should create a state with an object value', function () {
         const [{ count, text }, setMyState] = createState({ count: 0, text: 'Hello' });
 
@@ -18,6 +32,20 @@ describe('createState', function () {
         assert.equal(text(), 'Hello');
 
         setMyState({ count: 5 });
+        assert.equal(count(), 5);
+        assert.equal(text(), 'Hello'); // Verifica che `text` non sia cambiato
+    });
+
+    it('should create a state with an object value updated via callback', function () {
+        const [{ count, text }, setMyState] = createState({ count: 0, text: 'Hello' });
+
+        assert.equal(count(), 0);
+        assert.equal(text(), 'Hello');
+
+        setMyState(currentState => {
+            currentState.count = 5;
+            return currentState;
+        });
         assert.equal(count(), 5);
         assert.equal(text(), 'Hello'); // Verifica che `text` non sia cambiato
     });
