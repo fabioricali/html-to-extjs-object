@@ -1,4 +1,4 @@
-/* Extml, version: 2.9.2 - November 22, 2024 17:52:45 */
+/* Extml, version: 2.9.3 - November 22, 2024 17:54:20 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -168,7 +168,7 @@ function destroy() {
         __initializeHack(o) {
             {
                 if (this.__initializeHackAttempts > 100) {
-                    console.warn('this.el.dom not found');
+                    console.warn('this.el.dom not found', this);
                     return;
                 }
                 if (!this.el || !this.el.dom ) {
