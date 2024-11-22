@@ -1,4 +1,4 @@
-/* Extml, version: 2.9.0 - November 22, 2024 16:47:33 */
+/* Extml, version: 2.9.0 - November 22, 2024 16:50:23 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1065,7 +1065,7 @@ function createRef(onChange) {
                 component.removeAt(component.items.length - 1);
             }
 
-            // Aggiorna la mappa degli stati e gli elementi correnti
+            // Aggiorna la mappa degli stati
             childStateMap.clear();
             for (const [key, value] of newStateMap.entries()) {
                 childStateMap.set(key, value);
@@ -1084,6 +1084,7 @@ function createRef(onChange) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 
 // Utility function for deep comparison

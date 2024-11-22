@@ -2,7 +2,6 @@ import {h} from "./parser.js";
 
 export function For({ each, effect }) {
     function onInitialize(component) {
-        let currentItems = [];
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
         const updateChildren = (newItems) => {
@@ -27,12 +26,11 @@ export function For({ each, effect }) {
                 component.removeAt(component.items.length - 1);
             }
 
-            // Aggiorna la mappa degli stati e gli elementi correnti
+            // Aggiorna la mappa degli stati
             childStateMap.clear();
             for (const [key, value] of newStateMap.entries()) {
                 childStateMap.set(key, value);
             }
-            currentItems = newItems;
         };
 
         if (Array.isArray(each)) {
@@ -47,6 +45,7 @@ export function For({ each, effect }) {
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
 }
+
 
 
 // Utility function for deep comparison
