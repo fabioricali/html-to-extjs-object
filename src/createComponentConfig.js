@@ -51,9 +51,7 @@ function applyPropsToConfig(config, props) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
                 props[prop](o);
-            }))
-        } else if (prop === 'class') {
-            config['cls'] = props[prop];
+            }));
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
             let buildAttributeValue = () => props[prop].map(item => {
                 if (typeof item === 'function' && item.$$isState) {
@@ -75,17 +73,17 @@ function applyPropsToConfig(config, props) {
                         o.$$attributesStateListeners.push(item.$$subscribe(value => {
                             let setterName = createSetterName(prop);
                             if (typeof o[setterName] === 'function') {
-                                o[createSetterName(prop)](buildAttributeValue())
+                                o[createSetterName(prop)](buildAttributeValue());
                             }
-                        }))
+                        }));
                     }
-                })
-            }))
+                });
+            }));
             config.listeners.push(createEventObject('destroy', (o) => {
                 if (o.$$attributesStateListeners) {
                     o.$$attributesStateListeners.forEach(listener => listener());
                 }
-            }))
+            }));
         } else if (typeof props[prop] === 'function') {
             let propsProp = props[prop];
             if (propsProp.$$isState) {
@@ -94,18 +92,20 @@ function applyPropsToConfig(config, props) {
                     o.$$stateListener = propsProp.$$subscribe(value => {
                         let setterName = createSetterName(prop);
                         if (typeof o[setterName] === 'function') {
-                            o[createSetterName(prop)](value)
+                            o[createSetterName(prop)](value);
                         }
-                    })
-                }))
+                    });
+                }));
                 config.listeners.push(createEventObject('destroy', (o) => {
                     if (o.$$stateListener) {
-                        o.$$stateListener()
+                        o.$$stateListener();
                     }
-                }))
+                }));
                 props[prop] = props[prop]();
             }
             config[prop] = props[prop];
+        } else if (prop === 'class') {
+            config['cls'] = props[prop];
         } else {
             config[prop] = props[prop];
         }
