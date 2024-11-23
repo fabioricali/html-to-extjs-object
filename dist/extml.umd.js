@@ -1,4 +1,4 @@
-/* Extml, version: 2.14.0 - November 23, 2024 11:49:02 */
+/* Extml, version: 2.14.0 - November 23, 2024 12:21:36 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -143,7 +143,7 @@ function destroy() {
 }const htmlTags = [
     "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
     //custom tag
-    "x-state", "x-html", "x-for"
+    "x-s", "x-h"
 ];function defineExtClass(tag) {
     let className = 'html-' + tag;
     window.__extHtmlClass[className] = window.Ext.define(className, {
@@ -678,7 +678,7 @@ function configureChildren(config, children, type) {
             if (child.$$isState) {
                 // create state component
                 addToArray(config, 'items', {
-                    xtype: 'html-x-state',
+                    xtype: 'html-x-s',
                     html: String(child()),
                     listeners: [
                         createEventObject('initialize', (o) => {
@@ -706,7 +706,7 @@ function configureChildren(config, children, type) {
                     // create html text component
                     // console.log(processValueForHtml(child))
                     addToArray(config, 'items', {
-                        xtype: 'html-x-html',
+                        xtype: 'html-x-h',
                         html: processedValue,
                         listeners: [
                             createEventObject('initialize', initialize),
@@ -781,13 +781,14 @@ function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
+        // console.log('----', type, detectClassType(type.name), type(props))
         return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
 
 function h(strings, ...values) {
-    //console.log(strings, ...values)
+    // console.log(strings, ...values)
     let parsed = htm.bind(_h)(strings, ...values);
     //get style by component definition
     if (parsed.length > 1 && parsed[0].isStyle) {
@@ -1055,7 +1056,7 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For({ each, effect, getKey = (item) => item.id || item.name }) {
+}function For({ each, effect, getKey = (item) => item.id || item.name, tag }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
@@ -1100,50 +1101,7 @@ function createRef(onChange) {
     }
 
     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
-}
-
-
-
-
-// Utility function for deep comparison
-// function deepEqual(a, b) {
-//     if (a === b) return true;
-//
-//     if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
-//         const keysA = Object.keys(a);
-//         const keysB = Object.keys(b);
-//
-//         if (keysA.length !== keysB.length) return false;
-//
-//         return keysA.every(key => deepEqual(a[key], b[key]));
-//     }
-//
-//     return false;
-// }
-
-// export function For({ each, func }) {
-//     function onInitialize(component) {
-//         // Aggiunge dinamicamente i figli generati da func() in base a `each`
-//         each().forEach((item, index) => {
-//             const child = func(item, index); // Genera il contenuto per ogni elemento
-//             component.add(child);
-//         });
-//
-//         // Iscrivi un listener per aggiornare i contenuti se `each` è uno stato reattivo
-//         if (each.$$isState) {
-//             each.$$subscribe((newItems) => {
-//                 component.removeAll(); // Rimuove i componenti precedenti
-//                 newItems.forEach((item, index) => {
-//                     const child = func(item, index);
-//                     component.add(child);
-//                 });
-//             });
-//         }
-//     }
-//
-//     return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
-// }
-try {
+}try {
     if (window) {
         generateHtmlClass();
     }

@@ -149,7 +149,7 @@ function configureChildren(config, children, type) {
             if (child.$$isState) {
                 // create state component
                 addToArray(config, 'items', {
-                    xtype: 'html-x-state',
+                    xtype: 'html-x-s',
                     html: String(child()),
                     listeners: [
                         createEventObject('initialize', (o) => {
@@ -177,7 +177,7 @@ function configureChildren(config, children, type) {
                     // create html text component
                     // console.log(processValueForHtml(child))
                     addToArray(config, 'items', {
-                        xtype: 'html-x-html',
+                        xtype: 'html-x-h',
                         html: processedValue,
                         listeners: [
                             createEventObject('initialize', initialize),
