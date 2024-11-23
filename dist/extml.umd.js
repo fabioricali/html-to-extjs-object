@@ -1,4 +1,4 @@
-/* Extml, version: 2.15.0 - November 23, 2024 13:52:21 */
+/* Extml, version: 2.15.0 - November 23, 2024 14:20:46 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -257,6 +257,9 @@ function destroy() {
             }
         },
         listeners: [
+            {
+
+            },
             {
                 destroy() {
                     if (this.$$stateListener) {
@@ -538,7 +541,7 @@ function addEvent(componentConfig, eventObject) {
     'textcolumn', 'treecolumn'
 ];
 
-function createComponentConfig(type, props, children, propsFunction) {
+function createComponentConfig(type, props, children, propsFunction, isResolvedFunction) {
     // Default configuration
     let componentConfig = initializeComponentConfig(type);
 
@@ -546,7 +549,9 @@ function createComponentConfig(type, props, children, propsFunction) {
     let configFromProps = Object.assign({}, props, propsFunction);
 
     if (isHtmlType(configFromProps.xtype || type)) {
-        componentConfig._propsAttributes = props;
+        // console.log(props?._propsAttributes, isResolvedFunction)
+        // if (!isResolvedFunction)
+        componentConfig._propsAttributes = props?._propsAttributes && isResolvedFunction ? props._propsAttributes : props;
     } else {
         applyPropsToConfig(componentConfig, configFromProps);
     }
@@ -791,7 +796,7 @@ function _h(type, props, ...children) {
             children = children.concat(resolvedFunction.items);
         }
 
-        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props)
+        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }

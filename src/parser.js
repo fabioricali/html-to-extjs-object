@@ -23,7 +23,7 @@ export function _h(type, props, ...children) {
             children = children.concat(resolvedFunction.items)
         }
 
-        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props)
+        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }

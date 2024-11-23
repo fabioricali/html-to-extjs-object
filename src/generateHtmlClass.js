@@ -114,6 +114,9 @@ export function defineExtClass(tag) {
         },
         listeners: [
             {
+
+            },
+            {
                 destroy() {
                     if (this.$$stateListener) {
                         this.$$stateListener()

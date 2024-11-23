@@ -8,7 +8,7 @@ const columnTypes = [
     'textcolumn', 'treecolumn'
 ];
 
-export function createComponentConfig(type, props, children, propsFunction) {
+export function createComponentConfig(type, props, children, propsFunction, isResolvedFunction) {
     // Default configuration
     let componentConfig = initializeComponentConfig(type);
 
@@ -16,7 +16,9 @@ export function createComponentConfig(type, props, children, propsFunction) {
     let configFromProps = Object.assign({}, props, propsFunction);
 
     if (isHtmlType(configFromProps.xtype || type)) {
-        componentConfig._propsAttributes = props;
+        // console.log(props?._propsAttributes, isResolvedFunction)
+        // if (!isResolvedFunction)
+        componentConfig._propsAttributes = props?._propsAttributes && isResolvedFunction ? props._propsAttributes : props;
     } else {
         applyPropsToConfig(componentConfig, configFromProps);
     }
