@@ -1,4 +1,4 @@
-/* Extml, version: 2.18.0 - November 23, 2024 16:15:55 */
+/* Extml, version: 2.19.0 - November 23, 2024 16:25:10 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1071,7 +1071,7 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'x-f', attributes = {} }) {
+}function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
