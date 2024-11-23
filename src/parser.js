@@ -13,17 +13,17 @@ export function _h(type, props, ...children) {
     } else if (typeof type === 'function') {
         let resolvedFunction = type(props)
 
-        if (!isHtmlType(resolvedFunction.xtype)) {
-            return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
-        }
+        // if (!isHtmlType(resolvedFunction.xtype)) {
+        return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+        // }
 
-        if (resolvedFunction.html) {
-            children.push(resolvedFunction.html)
-        } else if (resolvedFunction.items) {
-            children = children.concat(resolvedFunction.items)
-        }
-
-        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
+        // if (resolvedFunction.html) {
+        //     children.push(resolvedFunction.html)
+        // } else if (resolvedFunction.items) {
+        //     children = children.concat(resolvedFunction.items)
+        // }
+        //
+        // return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }

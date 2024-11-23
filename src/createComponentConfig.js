@@ -16,13 +16,10 @@ export function createComponentConfig(type, props, children, propsFunction, isRe
     let configFromProps = Object.assign({}, props, propsFunction);
 
     if (isHtmlType(configFromProps.xtype || type)) {
-        // console.log(props?._propsAttributes, isResolvedFunction)
-        // if (!isResolvedFunction)
-        componentConfig._propsAttributes = props?._propsAttributes && isResolvedFunction ? props._propsAttributes : props;
-    } else {
-        applyPropsToConfig(componentConfig, configFromProps);
+        componentConfig._propsAttributes = props;
     }
 
+    applyPropsToConfig(componentConfig, configFromProps);
     // Configuration based on children
     configureChildren(componentConfig, children, type);
 

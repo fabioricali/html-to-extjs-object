@@ -1,4 +1,4 @@
-/* Extml, version: 2.16.0 - November 23, 2024 14:29:44 */
+/* Extml, version: 2.16.0 - November 23, 2024 14:52:51 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -143,7 +143,7 @@ function destroy() {
 }const htmlTags = [
     "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "content", "data", "datalist", "dd", "del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "element", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "image", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "math", "menu", "menuitem", "meta", "meter", "multicol", "nav", "nextid", "nobr", "noembed", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "picture", "plaintext", "pre", "progress", "q", "rb", "rbc", "rp", "rt", "rtc", "ruby", "s", "samp", "script", "section", "select", "shadow", "slot", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
     //custom tag
-    "x-s", "x-h"
+    "x-s", "x-h", "x-f"
 ];function defineExtClass(tag) {
     let className = 'html-' + tag;
     window.__extHtmlClass[className] = window.Ext.define(className, {
@@ -549,13 +549,10 @@ function createComponentConfig(type, props, children, propsFunction, isResolvedF
     let configFromProps = Object.assign({}, props, propsFunction);
 
     if (isHtmlType(configFromProps.xtype || type)) {
-        // console.log(props?._propsAttributes, isResolvedFunction)
-        // if (!isResolvedFunction)
-        componentConfig._propsAttributes = props?._propsAttributes && isResolvedFunction ? props._propsAttributes : props;
-    } else {
-        applyPropsToConfig(componentConfig, configFromProps);
+        componentConfig._propsAttributes = props;
     }
 
+    applyPropsToConfig(componentConfig, configFromProps);
     // Configuration based on children
     configureChildren(componentConfig, children, type);
 
@@ -786,17 +783,17 @@ function _h(type, props, ...children) {
     } else if (typeof type === 'function') {
         let resolvedFunction = type(props);
 
-        if (!isHtmlType(resolvedFunction.xtype)) {
-            return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
-        }
+        // if (!isHtmlType(resolvedFunction.xtype)) {
+        return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+        // }
 
-        if (resolvedFunction.html) {
-            children.push(resolvedFunction.html);
-        } else if (resolvedFunction.items) {
-            children = children.concat(resolvedFunction.items);
-        }
-
-        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
+        // if (resolvedFunction.html) {
+        //     children.push(resolvedFunction.html)
+        // } else if (resolvedFunction.items) {
+        //     children = children.concat(resolvedFunction.items)
+        // }
+        //
+        // return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
@@ -1070,7 +1067,7 @@ function createRef(onChange) {
     });
 
     return derived;
-}function For({ each, effect, getKey = (item) => item.id || item.name, tag }) {
+}function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'x-f', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
@@ -1114,7 +1111,7 @@ function createRef(onChange) {
         }
     }
 
-    return h`<ext-container oninitialize="${onInitialize}"></ext-container>`;
+    return h`<${tag} ...${attributes} oninitialize="${onInitialize}"></>`;
 }try {
     if (window) {
         generateHtmlClass();
