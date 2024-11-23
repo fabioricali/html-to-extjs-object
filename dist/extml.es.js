@@ -1,4 +1,4 @@
-/* Extml, version: 2.20.0 - November 23, 2024 16:54:02 */
+/* Extml, version: 2.20.0 - November 23, 2024 17:38:54 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -557,6 +557,7 @@ function createComponentConfig(type, props, children, propsFunction, isResolvedF
     }
 
     applyPropsToConfig(componentConfig, configFromProps);
+
     // Configuration based on children
     configureChildren(componentConfig, children, type);
 
@@ -778,6 +779,20 @@ function createSetterName(attribute) {
     return xtype;
 }// import htm from "htm";
 
+// export function _h(type, props, ...children) {
+//     if (type === 'style') {
+//         //console.log(children)
+//         return {isStyle: true, content: children}
+//     } else if (type === 'context') {
+//         return {isContext: true, props, children: children[0]}
+//     } else if (typeof type === 'function') {
+//         let resolvedFunction = type(props)
+//         return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+//     } else {
+//         return createComponentConfig(detectClassType(type), props, children);
+//     }
+// }
+
 function _h(type, props, ...children) {
     if (type === 'style') {
         //console.log(children)
@@ -785,19 +800,7 @@ function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        let resolvedFunction = type(props);
-
-        // if (!isHtmlType(resolvedFunction.xtype)) {
-        return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
-        // }
-
-        // if (resolvedFunction.html) {
-        //     children.push(resolvedFunction.html)
-        // } else if (resolvedFunction.items) {
-        //     children = children.concat(resolvedFunction.items)
-        // }
-        //
-        // return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
+        return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }

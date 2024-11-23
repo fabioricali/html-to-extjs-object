@@ -17,9 +17,12 @@ export function createComponentConfig(type, props, children, propsFunction, isRe
 
     if (isHtmlType(configFromProps.xtype || type)) {
         componentConfig._propsAttributes = props;
+    } else {
+        // console.log(type, props)
     }
 
     applyPropsToConfig(componentConfig, configFromProps);
+
     // Configuration based on children
     configureChildren(componentConfig, children, type);
 

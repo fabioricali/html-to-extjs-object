@@ -4,6 +4,20 @@ import {createComponentConfig} from "./createComponentConfig.js";
 import {detectClassType} from "./detectClassType.js";
 import {isHtmlType} from "./isHtmlType.js";
 
+// export function _h(type, props, ...children) {
+//     if (type === 'style') {
+//         //console.log(children)
+//         return {isStyle: true, content: children}
+//     } else if (type === 'context') {
+//         return {isContext: true, props, children: children[0]}
+//     } else if (typeof type === 'function') {
+//         let resolvedFunction = type(props)
+//         return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+//     } else {
+//         return createComponentConfig(detectClassType(type), props, children);
+//     }
+// }
+
 export function _h(type, props, ...children) {
     if (type === 'style') {
         //console.log(children)
@@ -11,19 +25,7 @@ export function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        let resolvedFunction = type(props)
-
-        // if (!isHtmlType(resolvedFunction.xtype)) {
-        return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
-        // }
-
-        // if (resolvedFunction.html) {
-        //     children.push(resolvedFunction.html)
-        // } else if (resolvedFunction.items) {
-        //     children = children.concat(resolvedFunction.items)
-        // }
-        //
-        // return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
+        return createComponentConfig(detectClassType(type.name), type(props), children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
