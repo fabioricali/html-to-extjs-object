@@ -1,4 +1,4 @@
-/* Extml, version: 2.19.0 - November 23, 2024 16:25:10 */
+/* Extml, version: 2.20.0 - November 23, 2024 16:54:02 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -589,8 +589,6 @@ function applyPropsToConfig(config, props) {
             config.listeners.push(createEventObject('initialize', (o) => {
                 props[prop](o);
             }));
-        } else if (prop === 'class') {
-            config['cls'] = props[prop];
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
             let buildAttributeValue = () => props[prop].map(item => {
                 if (typeof item === 'function' && item.$$isState) {
@@ -643,6 +641,8 @@ function applyPropsToConfig(config, props) {
                 props[prop] = props[prop]();
             }
             config[prop] = props[prop];
+        } else if (prop === 'class') {
+            config['cls'] = props[prop];
         } else {
             config[prop] = props[prop];
         }
