@@ -2,7 +2,7 @@
 import htm from "./htm/index.js";
 import {createComponentConfig} from "./createComponentConfig.js";
 import {detectClassType} from "./detectClassType.js";
-import {isHtmlType} from "./isHtmlType.js";
+// import {isHtmlType} from "./isHtmlType.js";
 
 // export function _h(type, props, ...children) {
 //     if (type === 'style') {
