@@ -1,4 +1,4 @@
-/* Extml, version: 2.15.0 - November 23, 2024 14:27:14 */
+/* Extml, version: 2.16.0 - November 23, 2024 14:29:44 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -219,7 +219,7 @@ function destroy() {
                 Object.keys(this._propsAttributes).forEach(attribute => {
                     if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
                         this._propsAttributes[attribute](this.el.dom);
-                    } else if (this._propsAttributes[attribute].$$isState) {
+                    } else if (this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isState) {
                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                         this.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                             this.el.dom.setAttribute(attribute, String(value));
@@ -257,6 +257,9 @@ function destroy() {
             }
         },
         listeners: [
+            {
+
+            },
             {
                 destroy() {
                     if (this.$$stateListener) {
@@ -530,13 +533,15 @@ function createEventObject(name, handle) {
 
 function addEvent(componentConfig, eventObject) {
     componentConfig.listeners.push(eventObject);
+}function isHtmlType(type) {
+    return (type).startsWith('html-')
 }const columnTypes = [
     'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
     'checkcolumn', 'datecolumn', 'numbercolumn', 'rownumberer',
     'textcolumn', 'treecolumn'
 ];
 
-function createComponentConfig(type, props, children, propsFunction) {
+function createComponentConfig(type, props, children, propsFunction, isResolvedFunction) {
     // Default configuration
     let componentConfig = initializeComponentConfig(type);
 
@@ -544,7 +549,9 @@ function createComponentConfig(type, props, children, propsFunction) {
     let configFromProps = Object.assign({}, props, propsFunction);
 
     if (isHtmlType(configFromProps.xtype || type)) {
-        componentConfig._propsAttributes = props;
+        // console.log(props?._propsAttributes, isResolvedFunction)
+        // if (!isResolvedFunction)
+        componentConfig._propsAttributes = props?._propsAttributes && isResolvedFunction ? props._propsAttributes : props;
     } else {
         applyPropsToConfig(componentConfig, configFromProps);
     }
@@ -553,10 +560,6 @@ function createComponentConfig(type, props, children, propsFunction) {
     configureChildren(componentConfig, children, type);
 
     return componentConfig;
-}
-
-function isHtmlType(type) {
-    return (type).startsWith('html-')
 }
 
 // Function to initialize the base configuration
@@ -781,8 +784,19 @@ function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        // console.log('----', type, detectClassType(type.name), type(props))
-        return createComponentConfig(detectClassType(type.name), type(props), children, props)
+        let resolvedFunction = type(props);
+
+        if (!isHtmlType(resolvedFunction.xtype)) {
+            return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+        }
+
+        if (resolvedFunction.html) {
+            children.push(resolvedFunction.html);
+        } else if (resolvedFunction.items) {
+            children = children.concat(resolvedFunction.items);
+        }
+
+        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props, true)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }
