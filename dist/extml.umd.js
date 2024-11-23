@@ -1,4 +1,4 @@
-/* Extml, version: 2.23.0 - November 23, 2024 21:05:55 */
+/* Extml, version: 2.23.0 - November 23, 2024 21:54:00 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -181,7 +181,9 @@ function destroy() {
                 this.innerElement.dom.className = '';
                 if (this._propsAttributes) {
                     Object.keys(this._propsAttributes).forEach(attribute => {
-                        if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) ; else if (this._propsAttributes[attribute].$$isState) {
+                        if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
+                            this._propsAttributes[attribute](o.el.dom);
+                        } else if (this._propsAttributes[attribute].$$isState) {
                             this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                             o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                                 this.el.dom.setAttribute(attribute, String(value));
