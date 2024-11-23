@@ -1,4 +1,4 @@
-/* Extml, version: 2.15.0 - November 23, 2024 12:22:33 */
+/* Extml, version: 2.15.0 - November 23, 2024 13:52:21 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -219,7 +219,7 @@ function destroy() {
                 Object.keys(this._propsAttributes).forEach(attribute => {
                     if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
                         this._propsAttributes[attribute](this.el.dom);
-                    } else if (this._propsAttributes[attribute].$$isState) {
+                    } else if (this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isState) {
                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                         this.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                             this.el.dom.setAttribute(attribute, String(value));
@@ -530,6 +530,8 @@ function createEventObject(name, handle) {
 
 function addEvent(componentConfig, eventObject) {
     componentConfig.listeners.push(eventObject);
+}function isHtmlType(type) {
+    return (type).startsWith('html-')
 }const columnTypes = [
     'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
     'checkcolumn', 'datecolumn', 'numbercolumn', 'rownumberer',
@@ -553,10 +555,6 @@ function createComponentConfig(type, props, children, propsFunction) {
     configureChildren(componentConfig, children, type);
 
     return componentConfig;
-}
-
-function isHtmlType(type) {
-    return (type).startsWith('html-')
 }
 
 // Function to initialize the base configuration
@@ -781,8 +779,19 @@ function _h(type, props, ...children) {
     } else if (type === 'context') {
         return {isContext: true, props, children: children[0]}
     } else if (typeof type === 'function') {
-        // console.log('----', type, detectClassType(type.name), type(props))
-        return createComponentConfig(detectClassType(type.name), type(props), children, props)
+        let resolvedFunction = type(props);
+
+        if (!isHtmlType(resolvedFunction.xtype)) {
+            return createComponentConfig(resolvedFunction.xtype, type(props), children, props)
+        }
+
+        if (resolvedFunction.html) {
+            children.push(resolvedFunction.html);
+        } else if (resolvedFunction.items) {
+            children = children.concat(resolvedFunction.items);
+        }
+
+        return createComponentConfig(resolvedFunction.xtype, resolvedFunction, children, props)
     }
     return createComponentConfig(detectClassType(type), props, children);
 }

@@ -75,7 +75,7 @@ export function defineExtClass(tag) {
                 Object.keys(this._propsAttributes).forEach(attribute => {
                     if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
                         this._propsAttributes[attribute](this.el.dom)
-                    } else if (this._propsAttributes[attribute].$$isState) {
+                    } else if (this._propsAttributes[attribute] && this._propsAttributes[attribute].$$isState) {
                         this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                         this.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                             this.el.dom.setAttribute(attribute, String(value));

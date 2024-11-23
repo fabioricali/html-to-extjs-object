@@ -1,5 +1,6 @@
 import {addEvent, createEventObject, extractListenerName, isEvent} from "./event.js";
 import {destroy, initialize} from "./defaultListeners.js";
+import {isHtmlType} from "./isHtmlType.js";
 
 const columnTypes = [
     'gridcolumn', 'column', 'templatecolumn', 'booleancolumn',
@@ -24,10 +25,6 @@ export function createComponentConfig(type, props, children, propsFunction) {
     configureChildren(componentConfig, children, type);
 
     return componentConfig;
-}
-
-function isHtmlType(type) {
-    return (type).startsWith('html-')
 }
 
 // Function to initialize the base configuration

@@ -63,7 +63,7 @@ describe('converts html to extjs object', function () {
         let result = h`
             <${Mother}/>
         `;
-        //console.log(result)
+        // console.log(result)
         assert.deepEqual(result, {
             xtype: 'toolbar',
             items: [
@@ -340,7 +340,7 @@ describe('converts html to extjs object', function () {
                 Inizio: <strong>${rangeStart}</strong> Fine: <strong>${rangeEnd}</strong> Durata: <strong>${rangeDuration}</strong>
             </div>
         `;
-        console.log(JSON.stringify(result, null, 4))
+        // console.log(JSON.stringify(result, null, 4))
         // assert.equal(result.cell.xtype, 'widgetcell');
         // assert.equal(result.cell.widget.items[0].xtype, 'button');
     });
