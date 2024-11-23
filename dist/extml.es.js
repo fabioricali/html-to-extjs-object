@@ -1,4 +1,4 @@
-/* Extml, version: 2.22.0 - November 23, 2024 17:50:39 */
+/* Extml, version: 2.22.0 - November 23, 2024 21:05:11 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -181,9 +181,7 @@ function destroy() {
                 this.innerElement.dom.className = '';
                 if (this._propsAttributes) {
                     Object.keys(this._propsAttributes).forEach(attribute => {
-                        if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
-                            this._propsAttributes[attribute](o.el.dom);
-                        } else if (this._propsAttributes[attribute].$$isState) {
+                        if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) ; else if (this._propsAttributes[attribute].$$isState) {
                             this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                             o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
                                 this.el.dom.setAttribute(attribute, String(value));
@@ -588,7 +586,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop](o);
+                props[prop](o.el.dom);
             }));
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
             let buildAttributeValue = () => props[prop].map(item => {
