@@ -1,4 +1,4 @@
-/* Extml, version: 2.24.0 - November 23, 2024 22:07:26 */
+/* Extml, version: 2.24.0 - November 24, 2024 19:26:30 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -164,21 +164,21 @@ function destroy() {
         getInnerHtmlElement() {
             return this.getRenderTarget();
         },
-        __initializeHackAttempts: 0,
         __initializeHack(o) {
             {
-                if (this.__initializeHackAttempts > 2) {
-                    // console.warn('this.el.dom not found', this)
-                    return;
-                }
                 if (!this.el || !this.el.dom ) {
-                    this.__initializeHackAttempts++;
-                    requestAnimationFrame(() => this.__initializeHack(o));
                     return
                 }
 
-                this.el.dom.className = '';
-                this.innerElement.dom.className = '';
+                //this.el.dom.className = '';
+                //this.innerElement.dom.className = '';
+                this.el.dom.removeAttribute('class');
+                // l'id mi serve per lo style
+                if (!this.stylesheet)
+                    this.el.dom.removeAttribute('id');
+                this.el.dom.removeAttribute('data-componentid');
+                this.el.dom.removeAttribute('data-xid');
+
                 if (this._propsAttributes) {
                     Object.keys(this._propsAttributes).forEach(attribute => {
                         if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
@@ -222,46 +222,46 @@ function destroy() {
                 }
             }
         },
+
+        removeMonitorsElements() {
+            // Rimuovo i due div del monitor, nodi dovrebbero essere sempre 3, quindi vado a colpo sicuro,
+            // il primo è il bodyElement, quello che poi conterrà eventuali figli
+            let sizeMonitorsEl = this.el.dom.childNodes[1];
+            let paintMonitorEl = this.el.dom.childNodes[2];
+
+            if (sizeMonitorsEl)
+                sizeMonitorsEl.remove();
+            if (paintMonitorEl)
+                paintMonitorEl.remove();
+        },
+
+        moveElementsToNewParent() {
+            // sposto gli elementi dal ghost-tag al parent
+            let newParent = this.el.dom;
+            let oldParent = this.innerElement.dom;
+
+            if (newParent && oldParent) {
+                function move() {
+                    while (oldParent.childNodes.length > 0) {
+                        newParent.appendChild(oldParent.childNodes[0]);
+                    }
+                }
+
+                move();
+
+                this.innerElement.dom = this.el.dom;
+
+                // Rimuovo ghost-tag
+                oldParent.remove();
+            }
+        },
         listeners: [
             {
                 initialize(o) {
                     //hack
                     requestAnimationFrame(() => this.__initializeHack(o));
-
-                    this.el.dom.removeAttribute('class');
-                    // l'id mi serve per lo style
-                    if (!this.stylesheet)
-                        this.el.dom.removeAttribute('id');
-                    this.el.dom.removeAttribute('data-componentid');
-                    this.el.dom.removeAttribute('data-xid');
-                    // Rimuovo i due div del monitor, nodi dovrebbero essere sempre 3, quindi vado a colpo sicuro,
-                    // il primo è il bodyElement, quello che poi conterrà eventuali figli
-                    let sizeMonitorsEl = this.el.dom.childNodes[1];
-                    let paintMonitorEl = this.el.dom.childNodes[2];
-
-                    if (sizeMonitorsEl)
-                        sizeMonitorsEl.remove();
-                    if (paintMonitorEl)
-                        paintMonitorEl.remove();
-
-                    // sposto gli elementi dal ghost-tag al parent
-                    let newParent = this.el.dom;
-                    let oldParent = this.innerElement.dom;
-
-                    if (newParent && oldParent) {
-                        function move() {
-                            while (oldParent.childNodes.length > 0) {
-                                newParent.appendChild(oldParent.childNodes[0]);
-                            }
-                        }
-
-                        move();
-
-                        this.innerElement.dom = this.el.dom;
-
-                        // Rimuovo ghost-tag
-                        oldParent.remove();
-                    }
+                    this.removeMonitorsElements();
+                    this.moveElementsToNewParent();
                 }
             },
             {
