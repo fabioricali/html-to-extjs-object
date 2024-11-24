@@ -20,7 +20,7 @@ export function defineExtClass(tag) {
         getInnerHtmlElement() {
             return this.getRenderTarget();
         },
-        __initializeHack(o) {
+        doHack() {
             {
                 if (!this.el || !this.el.dom ) {
                     return
@@ -117,9 +117,8 @@ export function defineExtClass(tag) {
         },
         listeners: [
             {
-                initialize(o) {
-                    //hack
-                    requestAnimationFrame(() => this.__initializeHack(o));
+                initialize() {
+                    requestAnimationFrame(() => this.doHack());
                     this.removeMonitorsElements();
                     this.moveElementsToNewParent();
                 }
