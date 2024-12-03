@@ -2,6 +2,9 @@ import {htmlTags} from "./htmlTags.js";
 
 export function defineExtClass(tag) {
     let className = 'html-' + tag;
+    if (window.__extHtmlClass[className]) {
+        return
+    }
     window.__extHtmlClass[className] = window.Ext.define(className, {
         extend: 'Ext.Container',
         xtype: className,
