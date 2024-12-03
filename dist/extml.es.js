@@ -1,4 +1,4 @@
-/* Extml, version: 2.27.0 - November 24, 2024 19:55:36 */
+/* Extml, version: 2.28.0 - December 3, 2024 14:58:05 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -146,6 +146,9 @@ function destroy() {
     "x-s", "x-h", "x-f"
 ];function defineExtClass(tag) {
     let className = 'html-' + tag;
+    if (window.__extHtmlClass[className]) {
+        return
+    }
     window.__extHtmlClass[className] = window.Ext.define(className, {
         extend: 'Ext.Container',
         xtype: className,
