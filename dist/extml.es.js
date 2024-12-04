@@ -1,4 +1,4 @@
-/* Extml, version: 2.31.0 - December 4, 2024 17:46:41 */
+/* Extml, version: 2.32.0 - December 4, 2024 17:58:36 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1090,6 +1090,9 @@ function createRef(onChange = null, isExtRef = false) {
 
     const initialValues = sourceStates.map(state => state());
     const [derived, setDerived] = createState(transformer(...initialValues, ...args));
+
+    // Inizializza e notifica il valore derivato per la prima volta
+    setDerived(transformer(...initialValues, ...args));
 
     // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
     sourceStates.forEach(state => {
