@@ -6,17 +6,21 @@ export default function createDerivedState(sourceStates, transformer, ...args) {
         sourceStates = [sourceStates];
     }
 
-    const initialValues = sourceStates.map(state => state());
-    const [derived, setDerived] = createState(transformer(...initialValues, ...args));
+    const [derived, setDerived] = createState(transformer(...sourceStates.map(s => s()), ...args));
 
-    // Inizializza e notifica il valore derivato per la prima volta
-    setDerived(transformer(...initialValues, ...args));
+    // Manteniamo un valore interno per tracciare l'ultimo aggiornamento
+    const updatedValues = [...sourceStates.map(s => s())];
+
+    // Funzione per calcolare il valore derivato in modo sincronizzato
+    const updateDerivedState = () => {
+        setDerived(transformer(...updatedValues, ...args));
+    };
 
     // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
-    sourceStates.forEach(state => {
-        state.$$subscribe(() => {
-            const updatedValues = sourceStates.map(s => s());
-            setDerived(transformer(...updatedValues, ...args));
+    sourceStates.forEach((state, index) => {
+        state.$$subscribe((newValue) => {
+            updatedValues[index] = newValue;
+            updateDerivedState();
         });
     });
 
