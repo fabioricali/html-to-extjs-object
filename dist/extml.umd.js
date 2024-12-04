@@ -1,4 +1,4 @@
-/* Extml, version: 2.32.0 - December 4, 2024 17:58:36 */
+/* Extml, version: 2.33.0 - December 4, 2024 22:06:45 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1088,17 +1088,21 @@ function createRef(onChange = null, isExtRef = false) {
         sourceStates = [sourceStates];
     }
 
-    const initialValues = sourceStates.map(state => state());
-    const [derived, setDerived] = createState(transformer(...initialValues, ...args));
+    const [derived, setDerived] = createState(transformer(...sourceStates.map(s => s()), ...args));
 
-    // Inizializza e notifica il valore derivato per la prima volta
-    setDerived(transformer(...initialValues, ...args));
+    // Manteniamo un valore interno per tracciare l'ultimo aggiornamento
+    const updatedValues = [...sourceStates.map(s => s())];
+
+    // Funzione per calcolare il valore derivato in modo sincronizzato
+    const updateDerivedState = () => {
+        setDerived(transformer(...updatedValues, ...args));
+    };
 
     // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
-    sourceStates.forEach(state => {
-        state.$$subscribe(() => {
-            const updatedValues = sourceStates.map(s => s());
-            setDerived(transformer(...updatedValues, ...args));
+    sourceStates.forEach((state, index) => {
+        state.$$subscribe((newValue) => {
+            updatedValues[index] = newValue;
+            updateDerivedState();
         });
     });
 
