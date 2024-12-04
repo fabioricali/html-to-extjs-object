@@ -9,6 +9,9 @@ export default function createDerivedState(sourceStates, transformer, ...args) {
     const initialValues = sourceStates.map(state => state());
     const [derived, setDerived] = createState(transformer(...initialValues, ...args));
 
+    // Inizializza e notifica il valore derivato per la prima volta
+    setDerived(transformer(...initialValues, ...args));
+
     // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
     sourceStates.forEach(state => {
         state.$$subscribe(() => {

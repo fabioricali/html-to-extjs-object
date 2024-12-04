@@ -76,4 +76,20 @@ describe('createDerivedState', function () {
         assert.strictEqual(derivedState(), "A is greater");
     });
 
+    it('should call the derived state initially with the correct value', function () {
+        const [sourceState, setSourceState] = createState(10);
+        const derivedState = createDerivedState(sourceState, (value) => value * 2);
+
+        // Il valore derivato dovrebbe essere inizialmente il doppio di sourceState
+        assert.strictEqual(derivedState(), 20);
+
+        // Aggiorniamo lo stato di origine e verifichiamo il valore derivato
+        setSourceState(15);
+        assert.strictEqual(derivedState(), 30);
+
+        // Impostiamo di nuovo uno stato di origine a zero e verifichiamo che il derivato si aggiorni correttamente
+        setSourceState(0);
+        assert.strictEqual(derivedState(), 0);
+    });
+
 });
