@@ -1,4 +1,4 @@
-/* Extml, version: 2.29.0 - December 4, 2024 10:24:06 */
+/* Extml, version: 2.30.0 - December 4, 2024 10:29:38 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -970,7 +970,7 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
 //
 //     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 // }
-function createRef(onChange, isExtRef = false) {
+function createRef(onChange = null, isExtRef = false) {
     let _current = null;
     const subscribers = [];
 
