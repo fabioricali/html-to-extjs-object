@@ -1,4 +1,4 @@
-/* Extml, version: 2.28.0 - December 3, 2024 14:58:05 */
+/* Extml, version: 2.29.0 - December 4, 2024 10:24:06 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -185,8 +185,11 @@ function destroy() {
                 if (this._propsAttributes) {
                     Object.keys(this._propsAttributes).forEach(attribute => {
                         if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
-                            // this._propsAttributes[attribute](o.el.dom)
-                            this._propsAttributes[attribute](this.el.dom);
+                            if (this._propsAttributes[attribute].$$isExtRef) {
+                                this._propsAttributes[attribute](this);
+                            } else {
+                                this._propsAttributes[attribute](this.el.dom);
+                            }
                         } else if (this._propsAttributes[attribute].$$isState) {
                             this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                             // o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {
@@ -594,7 +597,11 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop](o.el.dom);
+                if (props[prop].$$isExtRef) {
+                    props[prop](o);
+                } else {
+                    props[prop](o.el.dom);
+                }
             }));
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
             let buildAttributeValue = () => props[prop].map(item => {
@@ -963,7 +970,7 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
 //
 //     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
 // }
-function createRef(onChange) {
+function createRef(onChange, isExtRef = false) {
     let _current = null;
     const subscribers = [];
 
@@ -986,6 +993,7 @@ function createRef(onChange) {
 
     // Proprietà speciale per identificare l'oggetto come ref
     ref.$$isRef = true;
+    ref.$$isExtRef = isExtRef;
 
     // Metodo per aggiungere subscriber
     ref.$$subscribe = function(listener) {
@@ -1003,6 +1011,8 @@ function createRef(onChange) {
     };
 
     return ref;
+}function createExtRef(onChange = null) {
+    return createRef(onChange, true);
 }function createEffect(effect, dependencies, runInitially = false) {
     if (typeof effect !== "function") {
         throw new Error("Effect must be a function");
@@ -1130,4 +1140,4 @@ function createRef(onChange) {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.For=For;exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.For=For;exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createExtRef=createExtRef;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
