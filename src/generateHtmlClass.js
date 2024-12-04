@@ -41,8 +41,11 @@ export function defineExtClass(tag) {
                 if (this._propsAttributes) {
                     Object.keys(this._propsAttributes).forEach(attribute => {
                         if (attribute === 'ref' && this._propsAttributes[attribute].$$isRef) {
-                            // this._propsAttributes[attribute](o.el.dom)
-                            this._propsAttributes[attribute](this.el.dom)
+                            if (this._propsAttributes[attribute].$$isExtRef) {
+                                this._propsAttributes[attribute](this)
+                            } else {
+                                this._propsAttributes[attribute](this.el.dom)
+                            }
                         } else if (this._propsAttributes[attribute].$$isState) {
                             this.el.dom.setAttribute(attribute, String(this._propsAttributes[attribute]()));
                             // o.$$stateListener = this._propsAttributes[attribute].$$subscribe(value => {

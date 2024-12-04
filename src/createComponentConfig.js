@@ -53,7 +53,11 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
-                props[prop](o.el.dom);
+                if (props[prop].$$isExtRef) {
+                    props[prop](o);
+                } else {
+                    props[prop](o.el.dom);
+                }
             }));
         } else if (Array.isArray(props[prop]) && props[prop].$$hasState) {
             let buildAttributeValue = () => props[prop].map(item => {

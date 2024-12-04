@@ -1,4 +1,4 @@
-function createRef(onChange) {
+function createRef(onChange, isExtRef = false) {
     let _current = null;
     const subscribers = [];
 
@@ -21,6 +21,7 @@ function createRef(onChange) {
 
     // Proprietà speciale per identificare l'oggetto come ref
     ref.$$isRef = true;
+    ref.$$isExtRef = isExtRef;
 
     // Metodo per aggiungere subscriber
     ref.$$subscribe = function(listener) {
