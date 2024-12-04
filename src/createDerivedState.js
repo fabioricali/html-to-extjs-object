@@ -1,11 +1,20 @@
-import {createState} from "./createState.js";
+import { createState } from "./createState.js";
 
-export default function createDerivedState(sourceState, transformer, ...args) {
-    const [derived, setDerived] = createState(transformer(sourceState(), ...args));
+export default function createDerivedState(sourceStates, transformer, ...args) {
+    // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
+    if (!Array.isArray(sourceStates)) {
+        sourceStates = [sourceStates];
+    }
 
-    // Osserva cambiamenti nello stato di origine e aggiorna automaticamente quello derivato
-    sourceState.$$subscribe((newValue) => {
-        setDerived(transformer(newValue, ...args));
+    const initialValues = sourceStates.map(state => state());
+    const [derived, setDerived] = createState(transformer(...initialValues, ...args));
+
+    // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
+    sourceStates.forEach(state => {
+        state.$$subscribe(() => {
+            const updatedValues = sourceStates.map(s => s());
+            setDerived(transformer(...updatedValues, ...args));
+        });
     });
 
     return derived;

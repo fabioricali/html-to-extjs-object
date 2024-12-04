@@ -54,4 +54,26 @@ describe('createDerivedState', function () {
         setSourceState(5);
         assert.strictEqual(derivedState(), "odd");
     });
+
+    it('should update derived state only when one of the source states affects the result', function () {
+        const [stateA, setStateA] = createState(4);
+        const [stateB, setStateB] = createState(3);
+        const derivedState = createDerivedState([stateA, stateB], (a, b) => a > b ? "A is greater" : "B is greater or equal");
+
+        // Initial check
+        assert.strictEqual(derivedState(), "A is greater");
+
+        // Updating stateB to be greater should update derived state
+        setStateB(5);
+        assert.strictEqual(derivedState(), "B is greater or equal");
+
+        // Changing stateA to a lower value, which does not change derived result
+        setStateA(3);
+        assert.strictEqual(derivedState(), "B is greater or equal");
+
+        // Now make stateA greater again
+        setStateA(6);
+        assert.strictEqual(derivedState(), "A is greater");
+    });
+
 });
