@@ -1,4 +1,4 @@
-function createRef(onChange, isExtRef = false) {
+function createRef(onChange = null, isExtRef = false) {
     let _current = null;
     const subscribers = [];
 
