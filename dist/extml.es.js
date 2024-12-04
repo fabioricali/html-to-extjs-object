@@ -1,4 +1,4 @@
-/* Extml, version: 2.30.0 - December 4, 2024 10:29:38 */
+/* Extml, version: 2.31.0 - December 4, 2024 17:46:41 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1082,12 +1082,21 @@ function createRef(onChange = null, isExtRef = false) {
             };
         }
     };
-}function createDerivedState(sourceState, transformer, ...args) {
-    const [derived, setDerived] = createState(transformer(sourceState(), ...args));
+}function createDerivedState(sourceStates, transformer, ...args) {
+    // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
+    if (!Array.isArray(sourceStates)) {
+        sourceStates = [sourceStates];
+    }
 
-    // Osserva cambiamenti nello stato di origine e aggiorna automaticamente quello derivato
-    sourceState.$$subscribe((newValue) => {
-        setDerived(transformer(newValue, ...args));
+    const initialValues = sourceStates.map(state => state());
+    const [derived, setDerived] = createState(transformer(...initialValues, ...args));
+
+    // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
+    sourceStates.forEach(state => {
+        state.$$subscribe(() => {
+            const updatedValues = sourceStates.map(s => s());
+            setDerived(transformer(...updatedValues, ...args));
+        });
     });
 
     return derived;
