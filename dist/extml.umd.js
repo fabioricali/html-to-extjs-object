@@ -1,4 +1,4 @@
-/* Extml, version: 2.35.0 - December 5, 2024 13:09:02 */
+/* Extml, version: 2.36.0 - December 5, 2024 16:21:54 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1167,7 +1167,7 @@ function createRef(onChange = null, isExtRef = false) {
     });
 
     return derived;
-}function conditionalState(state, trueValue, falseValue) {
+}function conditionalState(state, trueValue = true, falseValue = false) {
     return createDerivedState(state, value => value ? trueValue : falseValue);
 }function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
