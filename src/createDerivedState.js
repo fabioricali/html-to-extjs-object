@@ -1,6 +1,6 @@
 import { createState } from "./createState.js";
 
-export default function createDerivedState(sourceStates, transformer, sync = false, ...args) {
+export default function createDerivedState(transformer, sourceStates, sync = false, ...args) {
     // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
     if (!Array.isArray(sourceStates)) {
         sourceStates = [sourceStates];
