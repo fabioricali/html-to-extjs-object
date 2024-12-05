@@ -1,4 +1,4 @@
-/* Extml, version: 2.33.0 - December 4, 2024 22:06:45 */
+/* Extml, version: 2.34.0 - December 5, 2024 12:12:42 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -841,9 +841,10 @@ function h(strings, ...values) {
         parsed.isContext = true;
     }
     return parsed
-}const stateCache = new WeakMap(); // Cache globale per stati persistenti
+}function createState(initialValue, context = null, treatAsSingleEntity = false, sync = false) {
+    // Aggiunto stateCache per la persistenza opzionale
+    const stateCache = createState.stateCache || (createState.stateCache = new WeakMap());
 
-function createState(initialValue, context = null, treatAsSingleEntity = false) {
     // Helper per gestire la persistenza opzionale
     const getPersistentState = (context, valueInitializer) => {
         if (!stateCache.has(context)) {
@@ -855,17 +856,19 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
     // Gestione della persistenza
     if (context) {
         return getPersistentState(context, () => {
-            return createState(initialValue, null, treatAsSingleEntity);
+            return createState(initialValue, null, treatAsSingleEntity, sync);
         });
     }
 
-    // Logica standard per creare lo stato
     let isObject = typeof initialValue === 'object' && initialValue !== null && !Array.isArray(initialValue) && !(initialValue instanceof Date) && !treatAsSingleEntity;
     let state = isObject ? { ...initialValue } : initialValue;
     const globalListeners = new Set();
     const propertyListeners = isObject
         ? Object.fromEntries(Object.keys(state).map(key => [key, new Set()]))
         : null;
+
+    let pendingUpdate = false;
+    let batchUpdates = [];
 
     const subscribe = (listener) => {
         globalListeners.add(listener);
@@ -880,38 +883,72 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
         if (typeof newValue === "function") {
             newValue = newValue(state);
         }
+
+        if (sync) {
+            applyState(newValue);
+            return Promise.resolve();
+        } else {
+            batchUpdates.push(newValue);
+            if (!pendingUpdate) {
+                pendingUpdate = true;
+                return new Promise((resolve) => {
+                    queueMicrotask(() => {
+                        pendingUpdate = false;
+                        processBatchUpdates();
+                        resolve();
+                    });
+                });
+            } else {
+                return Promise.resolve();
+            }
+        }
+    };
+
+    const applyState = (newValue) => {
+        let hasChanges = false;
+
         if (Array.isArray(initialValue)) {
             if (!arraysEqual(state, newValue)) {
                 state = [...newValue];
-                globalListeners.forEach(listener => listener(state));
+                hasChanges = true;
             }
         } else if (initialValue instanceof Date) {
             if (state.getTime() !== newValue.getTime()) {
                 state = new Date(newValue);
-                globalListeners.forEach(listener => listener(state));
+                hasChanges = true;
             }
         } else if (isObject) {
-            let hasChanges = false;
             const newState = { ...state };
 
             Object.keys(newValue).forEach(key => {
                 if (newValue[key] !== state[key]) {
                     newState[key] = newValue[key];
                     hasChanges = true;
+
+                    // Notifica i listener per la singola proprietà
                     propertyListeners[key].forEach(listener => listener(newState[key]));
                 }
             });
 
             if (hasChanges) {
                 state = newState;
-                globalListeners.forEach(listener => listener(state));
             }
         } else {
             if (newValue !== state) {
                 state = newValue;
-                globalListeners.forEach(listener => listener(state));
+                hasChanges = true;
             }
         }
+
+        if (hasChanges) {
+            // Notifica i listener globali
+            globalListeners.forEach(listener => listener(state));
+        }
+    };
+
+    const processBatchUpdates = () => {
+        batchUpdates.forEach(newValue => applyState(newValue));
+        batchUpdates = [];
     };
 
     // Creazione di setter specifici per ogni proprietà
@@ -920,7 +957,11 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
             setState[key] = (newValue) => {
                 if (state[key] !== newValue) {
                     state = { ...state, [key]: newValue };
+
+                    // Notifica i listener della proprietà specifica
                     propertyListeners[key].forEach(listener => listener(state[key]));
+
+                    // Notifica i listener globali
                     globalListeners.forEach(listener => listener(state));
                 }
             };
@@ -945,6 +986,11 @@ function createState(initialValue, context = null, treatAsSingleEntity = false) 
 
     return [isObject ? stateGetters : getState, setState, subscribe];
 }
+
+
+
+
+
 
 // export function createState(initialValue) {
 //     let state = initialValue;
@@ -1082,20 +1128,34 @@ function createRef(onChange = null, isExtRef = false) {
             };
         }
     };
-}function createDerivedState(sourceStates, transformer, ...args) {
+}function createDerivedState(sourceStates, transformer, sync = false, ...args) {
     // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
     if (!Array.isArray(sourceStates)) {
         sourceStates = [sourceStates];
     }
 
-    const [derived, setDerived] = createState(transformer(...sourceStates.map(s => s()), ...args));
+    // Creiamo lo stato derivato iniziale
+    const [derived, setDerived] = createState(transformer(...sourceStates.map(s => s()), ...args), null, false, sync);
 
     // Manteniamo un valore interno per tracciare l'ultimo aggiornamento
     const updatedValues = [...sourceStates.map(s => s())];
 
-    // Funzione per calcolare il valore derivato in modo sincronizzato
+    // Flag per evitare aggiornamenti multipli durante il batch
+    let pendingUpdate = false;
+
+    // Funzione per calcolare il valore derivato in modo sincronizzato o batchato
     const updateDerivedState = () => {
-        setDerived(transformer(...updatedValues, ...args));
+        if (sync) {
+            setDerived(transformer(...updatedValues, ...args));
+        } else {
+            if (!pendingUpdate) {
+                pendingUpdate = true;
+                queueMicrotask(() => {
+                    pendingUpdate = false;
+                    setDerived(transformer(...updatedValues, ...args));
+                });
+            }
+        }
     };
 
     // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
