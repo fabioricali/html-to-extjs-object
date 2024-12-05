@@ -1,4 +1,4 @@
-/* Extml, version: 2.36.0 - December 5, 2024 16:21:54 */
+/* Extml, version: 2.37.0 - December 5, 2024 17:12:54 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -623,7 +623,7 @@ function applyPropsToConfig(config, props) {
                     if (typeof item === 'function' && item.$$isState) {
                         o.$$attributesStateListeners.push(item.$$subscribe(value => {
                             let setterName = createSetterName(prop);
-                            if (typeof o[setterName] === 'function') {
+                            if (typeof o[setterName] === 'function' && !o.destroyed) {
                                 o[createSetterName(prop)](buildAttributeValue());
                             }
                         }));
@@ -642,7 +642,7 @@ function applyPropsToConfig(config, props) {
                 config.listeners.push(createEventObject('initialize', (o) => {
                     o.$$stateListener = propsProp.$$subscribe(value => {
                         let setterName = createSetterName(prop);
-                        if (typeof o[setterName] === 'function') {
+                        if (typeof o[setterName] === 'function'  && !o.destroyed) {
                             o[createSetterName(prop)](value);
                         }
                     });
