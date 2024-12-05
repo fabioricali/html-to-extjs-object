@@ -1,10 +1,6 @@
 import {createState} from "../src/index.js";
 import assert from "node:assert";
 
-global.requestAnimationFrame = (callback) => {
-    return setTimeout(callback, 0);
-};
-
 describe('createState', function () {
 
     it('should create a state with a single value', function () {
