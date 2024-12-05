@@ -1,4 +1,4 @@
-/* Extml, version: 2.34.0 - December 5, 2024 12:12:42 */
+/* Extml, version: 2.35.0 - December 5, 2024 13:09:02 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1167,6 +1167,8 @@ function createRef(onChange = null, isExtRef = false) {
     });
 
     return derived;
+}function conditionalState(state, trueValue, falseValue) {
+    return createDerivedState(state, value => value ? trueValue : falseValue);
 }function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
@@ -1216,4 +1218,4 @@ function createRef(onChange = null, isExtRef = false) {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}exports.For=For;exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createExtRef=createExtRef;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));
+} catch (e) {}exports.For=For;exports.conditionalState=conditionalState;exports.createDerivedState=createDerivedState;exports.createEffect=createEffect;exports.createExtRef=createExtRef;exports.createPropertyObserver=createPropertyObserver;exports.createRef=createRef;exports.createState=createState;exports.defineExtClass=defineExtClass;exports.destroy=destroy;exports.generateHtmlClass=generateHtmlClass;exports.h=h;exports.initialize=initialize;}));

@@ -1,4 +1,4 @@
-/* Extml, version: 2.34.0 - December 5, 2024 12:12:42 */
+/* Extml, version: 2.35.0 - December 5, 2024 13:09:02 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1167,6 +1167,8 @@ function createRef(onChange = null, isExtRef = false) {
     });
 
     return derived;
+}function conditionalState(state, trueValue, falseValue) {
+    return createDerivedState(state, value => value ? trueValue : falseValue);
 }function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
@@ -1216,4 +1218,4 @@ function createRef(onChange = null, isExtRef = false) {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{For,createDerivedState,createEffect,createExtRef,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{For,conditionalState,createDerivedState,createEffect,createExtRef,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize};
