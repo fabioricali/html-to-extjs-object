@@ -1,4 +1,4 @@
-import {createState, conditionalState} from "../src/index.js";
+import {createState, conditionalState, createDerivedState} from "../src/index.js";
 import assert from "node:assert";
 
 function waiting() {
@@ -31,6 +31,27 @@ describe('conditionalState', function () {
         setMyState(true);
         await waiting(); // Attendi che lo stato si aggiorni
         assert.equal(result(), 'visible'); // Stato aggiornato: true restituisce 'visible'
+    });
+
+    it('should return custom values based on derived state', async function () {
+        const [myStateA, setMyStateA] = createState(1);
+        const [myStateB, setMyStateB] = createState(2);
+        // const result = conditionalState(createDerivedState([myStateA, myStateB], (a, b) => a + b === 3));
+        const result = createDerivedState(
+            [myStateA, myStateB],
+            (a, b) => a + b === 3
+        );
+
+        await waiting();
+        assert.equal(result(), true);
+
+        await setMyStateB(4)
+        await waiting();
+        assert.equal(result(), false);
+
+        await setMyStateB(2)
+        await waiting();
+        assert.equal(result(), true);
     });
 
 });
