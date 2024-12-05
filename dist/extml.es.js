@@ -1,4 +1,4 @@
-/* Extml, version: 2.37.0 - December 5, 2024 17:12:54 */
+/* Extml, version: 2.38.0 - December 5, 2024 18:33:26 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1128,7 +1128,7 @@ function createRef(onChange = null, isExtRef = false) {
             };
         }
     };
-}function createDerivedState(sourceStates, transformer, sync = false, ...args) {
+}function createDerivedState(transformer, sourceStates, sync = false, ...args) {
     // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
     if (!Array.isArray(sourceStates)) {
         sourceStates = [sourceStates];
@@ -1168,7 +1168,7 @@ function createRef(onChange = null, isExtRef = false) {
 
     return derived;
 }function conditionalState(state, trueValue = true, falseValue = false) {
-    return createDerivedState(state, value => value ? trueValue : falseValue);
+    return createDerivedState(value => value ? trueValue : falseValue, state);
 }function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
