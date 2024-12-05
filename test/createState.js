@@ -1,10 +1,14 @@
 import {createState} from "../src/index.js";
 import assert from "node:assert";
 
+global.requestAnimationFrame = (callback) => {
+    return setTimeout(callback, 0);
+};
+
 describe('createState', function () {
 
     it('should create a state with a single value', function () {
-        const [myState, setMyState] = createState(0);
+        const [myState, setMyState] = createState(0, null, false, true); // Modalità sincrona per i test
         assert.equal(myState(), 0);
 
         setMyState(10);
@@ -12,7 +16,7 @@ describe('createState', function () {
     });
 
     it('should create a state with a single value updated via callback', function () {
-        const [myState, setMyState] = createState(0);
+        const [myState, setMyState] = createState(0, null, false, true);
         assert.equal(myState(), 0);
 
         setMyState(currentState => currentState + 2);
@@ -26,7 +30,7 @@ describe('createState', function () {
     });
 
     it('should create a state with an object value', function () {
-        const [{ count, text }, setMyState] = createState({ count: 0, text: 'Hello' });
+        const [{ count, text }, setMyState] = createState({ count: 0, text: 'Hello' }, null, false, true);
 
         assert.equal(count(), 0);
         assert.equal(text(), 'Hello');
@@ -51,23 +55,13 @@ describe('createState', function () {
     });
 
     it('should notify global listeners on state change', function () {
-        const [{ count }, setMyState, subscribe] = createState({ count: 0 });
+        const [{ count }, setMyState, subscribe] = createState({ count: 0 }, null, false, true);
 
         let globalState;
         subscribe((newState) => { globalState = newState; });
 
         setMyState({ count: 10 });
         assert.equal(globalState.count, 10);
-    });
-
-    it('should notify only the specific property listener on change', function () {
-        const [{ count }, setMyState] = createState({ count: 0, text: 'Hello' });
-
-        let specificValue;
-        count.$$subscribe((newCount) => { specificValue = newCount; });
-
-        setMyState({ count: 5 });
-        assert.equal(specificValue, 5); // Verifica che il listener della proprietà sia stato notificato
     });
 
     it('should not notify property listener if value remains the same', function () {
@@ -102,7 +96,7 @@ describe('createState', function () {
     });
 
     it('should allow multiple subscriptions to a single property and notify all listeners', function () {
-        const [{ count }, setMyState] = createState({ count: 0 });
+        const [{ count }, setMyState] = createState({ count: 0 }, null, false, true);
 
         let listener1, listener2;
         count.$$subscribe((newCount) => { listener1 = newCount; });
@@ -124,7 +118,7 @@ describe('createState', function () {
     });
 
     it('should handle arrays as single entities', function () {
-        const [myArray, setMyArray] = createState([1, 2, 3]);
+        const [myArray, setMyArray] = createState([1, 2, 3], null, false, true);
 
         assert.deepEqual(myArray(), [1, 2, 3]);
 
@@ -134,7 +128,7 @@ describe('createState', function () {
 
     it('should handle Date objects as single entities', function () {
         const date = new Date();
-        const [myDate, setMyDate] = createState(date);
+        const [myDate, setMyDate] = createState(date, null, false, true);
 
         assert.equal(myDate().getTime(), date.getTime());
 
@@ -146,7 +140,7 @@ describe('createState', function () {
     it('should allow persistent state using a context', function () {
         const context = {}; // Contesto unico
 
-        const [state1, setState1] = createState(0, context);
+        const [state1, setState1] = createState(0, context, false, true);
 
         setState1(42);
 
@@ -160,6 +154,59 @@ describe('createState', function () {
 
         const [state3] = createState(0, {});
         assert.strictEqual(state3(), 0); // Stato isolato
+    });
+
+    it('should resolve the promise after state is updated', async function () {
+        const [state, setState] = createState(0, null, false, false); // Modalità asincrona
+
+        await setState(10);
+        assert.strictEqual(state(), 10); // Il valore deve essere aggiornato dopo l'await
+    });
+
+    it('should resolve immediately for sync mode', async function () {
+        const [state, setState] = createState(0, null, false, true); // Modalità sincrona
+
+        const promise = setState(20);
+        assert(promise instanceof Promise);
+        await promise; // La promise dovrebbe essere già risolta
+        assert.strictEqual(state(), 20); // Lo stato deve essere aggiornato immediatamente
+    });
+
+    it('should batch updates and resolve promise after all updates are processed', async function () {
+        const [state, setState] = createState(0, null, false, false); // Modalità asincrona (batch)
+
+        const promise1 = setState(30);
+        const promise2 = setState(50);
+
+        await promise1; // Attendi la risoluzione del primo aggiornamento in batch
+        assert.strictEqual(state(), 50); // Deve riflettere l'ultimo aggiornamento
+
+        await promise2; // Il secondo deve essere già risolto
+
+        // Stato finale dovrebbe essere 50 perché è l'ultimo valore impostato
+        assert.strictEqual(state(), 50);
+    });
+
+    it('should notify all listeners before resolving promise', async function () {
+        const [{ count }, setState, subscribe] = createState({ count: 0 }, null, false, false); // Modalità asincrona (batch)
+
+        let listenerNotified = false;
+        subscribe(() => { listenerNotified = true; });
+
+        await setState({ count: 100 });
+
+        assert.strictEqual(count(), 100);
+        assert.strictEqual(listenerNotified, true); // Il listener deve essere notificato prima della risoluzione
+    });
+
+    it('should not notify global listeners if no change in state', function () {
+        const [{ count }, setState, subscribe] = createState({ count: 0 }, null, false, true); // Modalità sincrona
+
+        let globalCalled = false;
+        subscribe(() => { globalCalled = true; });
+
+        setState({ count: 0 });
+        assert.strictEqual(globalCalled, false); // Nessuna notifica per cambiamenti inutili
     });
 
 });
