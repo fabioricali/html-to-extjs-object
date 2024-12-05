@@ -79,7 +79,7 @@ function applyPropsToConfig(config, props) {
                     if (typeof item === 'function' && item.$$isState) {
                         o.$$attributesStateListeners.push(item.$$subscribe(value => {
                             let setterName = createSetterName(prop);
-                            if (typeof o[setterName] === 'function') {
+                            if (typeof o[setterName] === 'function' && !o.destroyed) {
                                 o[createSetterName(prop)](buildAttributeValue());
                             }
                         }));
@@ -98,7 +98,7 @@ function applyPropsToConfig(config, props) {
                 config.listeners.push(createEventObject('initialize', (o) => {
                     o.$$stateListener = propsProp.$$subscribe(value => {
                         let setterName = createSetterName(prop);
-                        if (typeof o[setterName] === 'function') {
+                        if (typeof o[setterName] === 'function'  && !o.destroyed) {
                             o[createSetterName(prop)](value);
                         }
                     });
