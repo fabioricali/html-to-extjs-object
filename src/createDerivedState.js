@@ -1,39 +1,54 @@
 import { createState } from "./createState.js";
 
-export default function createDerivedState(transformer, sourceStates, sync = false, ...args) {
-    // Se sourceStates non è un array, lo convertiamo in un array con un solo elemento
-    if (!Array.isArray(sourceStates)) {
-        sourceStates = [sourceStates];
+// Variabile globale per il tracking delle dipendenze
+let activeTracker = null;
+
+// Wrapper per tracciare l'accesso agli stati
+function trackDependency(state) {
+    if (activeTracker) {
+        activeTracker.add(state);
     }
+    return state();
+}
 
-    // Creiamo lo stato derivato iniziale
-    const [derived, setDerived] = createState(transformer(...sourceStates.map(s => s()), ...args), null, false, sync);
+export default function createDerivedState(transformer, sync = false, ...args) {
+    const dependencies = new Set();
 
-    // Manteniamo un valore interno per tracciare l'ultimo aggiornamento
-    const updatedValues = [...sourceStates.map(s => s())];
+    // Wrapper per intercettare l'accesso agli stati
+    const trackingWrapper = (...args) => {
+        activeTracker = dependencies;
+        try {
+            return transformer(...args.map(arg => (arg.$$isState ? trackDependency(arg) : arg)));
+        } finally {
+            activeTracker = null;
+        }
+    };
 
-    // Flag per evitare aggiornamenti multipli durante il batch
+    // Esegui il transformer iniziale per raccogliere le dipendenze
+    const [derived, setDerived] = createState(trackingWrapper(...args), null, false, sync);
+
+    const updatedValues = new Map();
     let pendingUpdate = false;
 
-    // Funzione per calcolare il valore derivato in modo sincronizzato o batchato
     const updateDerivedState = () => {
         if (sync) {
-            setDerived(transformer(...updatedValues, ...args));
+            setDerived(trackingWrapper(...args));
         } else {
             if (!pendingUpdate) {
                 pendingUpdate = true;
                 queueMicrotask(() => {
                     pendingUpdate = false;
-                    setDerived(transformer(...updatedValues, ...args));
+                    setDerived(trackingWrapper(...args));
                 });
             }
         }
     };
 
-    // Osserva cambiamenti in tutti gli stati di origine e aggiorna automaticamente quello derivato
-    sourceStates.forEach((state, index) => {
+    // Aggiungi listener alle dipendenze
+    dependencies.forEach((state) => {
+        updatedValues.set(state, state());
         state.$$subscribe((newValue) => {
-            updatedValues[index] = newValue;
+            updatedValues.set(state, newValue);
             updateDerivedState();
         });
     });

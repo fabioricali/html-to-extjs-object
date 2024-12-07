@@ -2,7 +2,7 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
     // Aggiunto stateCache per la persistenza opzionale
     const stateCache = createState.stateCache || (createState.stateCache = new WeakMap());
 
-    // Helper per gestire la persistenza opzionale
+    // Helper per la gestione della persistenza
     const getPersistentState = (context, valueInitializer) => {
         if (!stateCache.has(context)) {
             stateCache.set(context, valueInitializer());
@@ -10,34 +10,44 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
         return stateCache.get(context);
     };
 
-    // Gestione della persistenza
+    // Gestione della persistenza tramite contesto
     if (context) {
         return getPersistentState(context, () => {
             return createState(initialValue, null, treatAsSingleEntity, sync);
         });
     }
 
-    let isObject = typeof initialValue === 'object' && initialValue !== null && !Array.isArray(initialValue) && !(initialValue instanceof Date) && !treatAsSingleEntity;
+    // Determinazione del tipo di stato iniziale
+    const isObject = typeof initialValue === 'object' && initialValue !== null && !Array.isArray(initialValue) && !(initialValue instanceof Date) && !treatAsSingleEntity;
     let state = isObject ? { ...initialValue } : initialValue;
+
+    // Inizializzazione dei listener globali e per proprietà (se oggetto)
     const globalListeners = new Set();
     const propertyListeners = isObject
         ? Object.fromEntries(Object.keys(state).map(key => [key, new Set()]))
         : null;
 
-    let pendingUpdate = false;
+    // Variabili per il batching
     let batchUpdates = [];
+    let pendingUpdate = false;
 
-    const subscribe = (listener) => {
+    // Funzione per ottenere lo stato corrente (aggiunge tracking se attivo)
+    const getState = () => {
+        if (createState.activeTracker) {
+            createState.activeTracker.add(getState);
+        }
+        return state;
+    };
+
+    getState.$$isState = true;
+    getState.$$subscribe = listener => {
         globalListeners.add(listener);
         return () => globalListeners.delete(listener);
     };
 
-    const getState = () => state;
-    getState.$$isState = true;
-    getState.$$subscribe = subscribe;
-
+    // Funzione per aggiornare lo stato
     const setState = (newValue) => {
-        if (typeof newValue === "function") {
+        if (typeof newValue === 'function') {
             newValue = newValue(state);
         }
 
@@ -61,6 +71,7 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
         }
     };
 
+    // Funzione per applicare un nuovo stato
     const applyState = (newValue) => {
         let hasChanges = false;
 
@@ -82,7 +93,7 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
                     newState[key] = newValue[key];
                     hasChanges = true;
 
-                    // Notifica i listener per la singola proprietà
+                    // Notifica i listener per proprietà specifiche
                     propertyListeners[key].forEach(listener => listener(newState[key]));
                 }
             });
@@ -103,34 +114,25 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
         }
     };
 
+    // Funzione per processare gli aggiornamenti batch
     const processBatchUpdates = () => {
         batchUpdates.forEach(newValue => applyState(newValue));
         batchUpdates = [];
     };
 
-    // Creazione di setter specifici per ogni proprietà
-    if (isObject) {
-        Object.keys(state).forEach(key => {
-            setState[key] = (newValue) => {
-                if (state[key] !== newValue) {
-                    state = { ...state, [key]: newValue };
-
-                    // Notifica i listener della proprietà specifica
-                    propertyListeners[key].forEach(listener => listener(state[key]));
-
-                    // Notifica i listener globali
-                    globalListeners.forEach(listener => listener(state));
-                }
-            };
-        });
-    }
-
+    // Helper per confrontare array
     const arraysEqual = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]);
 
+    // Getter per proprietà (se oggetto)
     const stateGetters = isObject
         ? Object.fromEntries(
             Object.keys(state).map(key => {
-                const propertyGetter = () => state[key];
+                const propertyGetter = () => {
+                    if (createState.activeTracker) {
+                        createState.activeTracker.add(propertyGetter);
+                    }
+                    return state[key];
+                };
                 propertyGetter.$$isState = true;
                 propertyGetter.$$subscribe = listener => {
                     propertyListeners[key].add(listener);
@@ -141,35 +143,8 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
         )
         : getState;
 
-    return [isObject ? stateGetters : getState, setState, subscribe];
+    return [isObject ? stateGetters : getState, setState, getState.$$subscribe];
 }
 
-
-
-
-
-
-// export function createState(initialValue) {
-//     let state = initialValue;
-//     const listeners = new Set();
-//
-//     // Funzione per iscriversi ai cambiamenti di stato
-//     const subscribe = (listener) => {
-//         listeners.add(listener);
-//         return () => listeners.delete(listener); // Ritorna una funzione per rimuovere l'observer
-//     };
-//     // Funzione getter che restituisce un oggetto con valore e tipo
-//     const getState = () => state;
-//     getState.$$isState = true; // Aggiunge la proprietà isState direttamente alla funzione
-//     getState.$$subscribe = subscribe;
-//
-//     // Funzione setter
-//     const setState = (newValue) => {
-//         if (newValue !== state) {
-//             state = newValue;
-//             listeners.forEach((listener) => listener(state));
-//         }
-//     };
-//
-//     return [getState, setState, subscribe]; // Ritorniamo anche subscribe
-// }
+// Variabile globale per il tracking delle dipendenze
+createState.activeTracker = null;
