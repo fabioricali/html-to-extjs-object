@@ -38,8 +38,7 @@ describe('conditionalState', function () {
         const [myStateB, setMyStateB] = createState(2);
         // const result = conditionalState(createDerivedState([myStateA, myStateB], (a, b) => a + b === 3));
         const result = createDerivedState(
-            (a, b) => a + b === 3,
-            [myStateA, myStateB]
+            () => myStateA() + myStateB() === 3,
         );
 
         await waiting();

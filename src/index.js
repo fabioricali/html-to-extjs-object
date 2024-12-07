@@ -6,7 +6,7 @@ import createRef from "./createRef.js";
 import createExtRef from "./createExtRef.js";
 import createEffect from "./createEffect.js";
 import createPropertyObserver from "./createPropertyObserver.js";
-import createDerivedState from "./createDerivedState.js";
+import {createDerivedState} from "./createDerivedState.js";
 import conditionalState from "./conditionalState.js";
 import {For} from "./For.js";
 export {
