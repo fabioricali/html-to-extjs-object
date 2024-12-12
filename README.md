@@ -35,7 +35,7 @@ console.log(result)
 }
  */
 
-//Define a scoped style for the component and his children
+//Define a scoped style for the component and its children
 let result = h`
     <style>
         :component {
