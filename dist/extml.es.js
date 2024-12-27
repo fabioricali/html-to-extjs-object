@@ -1,4 +1,4 @@
-/* Extml, version: 2.39.0 - December 7, 2024 22:10:57 */
+/* Extml, version: 2.40.0 - December 27, 2024 15:16:30 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -914,6 +914,7 @@ function setActiveTracker(tracker) {
             }
         }
     };
+    getState.$$setState = setState;
 
     const applyState = (newValue) => {
         let hasChanges = false;
@@ -974,6 +975,7 @@ function setActiveTracker(tracker) {
                     return state[key];
                 };
                 propertyGetter.$$isState = true;
+                propertyGetter.$$setState = setState[key];
                 propertyGetter.$$subscribe = listener => {
                     propertyListeners[key].add(listener);
                     return () => propertyListeners[key].delete(listener);
@@ -1127,6 +1129,8 @@ function setActiveTracker(tracker) {
     return derived;
 }function conditionalState(state, trueValue = true, falseValue = false) {
     return createDerivedState(() => state() ? trueValue : falseValue);
+}function toggleState(state) {
+    return state.$$setState(currentState => !currentState);
 }function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
@@ -1176,4 +1180,4 @@ function setActiveTracker(tracker) {
     if (window) {
         generateHtmlClass();
     }
-} catch (e) {}export{For,conditionalState,createDerivedState,createEffect,createExtRef,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize};
+} catch (e) {}export{For,conditionalState,createDerivedState,createEffect,createExtRef,createPropertyObserver,createRef,createState,defineExtClass,destroy,generateHtmlClass,h,initialize,toggleState};
