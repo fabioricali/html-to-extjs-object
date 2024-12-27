@@ -1,7 +1,7 @@
 import { setActiveTracker } from './dependencyTracker.js';
 import { createState } from './createState.js';
 
-export function createDerivedState(transformer, sync = false, ...args) {
+export default function createDerivedState(transformer, sync = false, ...args) {
     const dependencies = new Set();
 
     const trackingWrapper = (...args) => {

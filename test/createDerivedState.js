@@ -1,6 +1,5 @@
 import assert from 'assert';
-import { createDerivedState } from "../src/createDerivedState.js";
-import { createState } from "../src/createState.js";
+import { createState, createDerivedState } from "../src/index.js";
 
 describe('createDerivedState', function () {
 

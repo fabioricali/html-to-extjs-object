@@ -65,6 +65,7 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
             }
         }
     };
+    getState.$$setState = setState;
 
     const applyState = (newValue) => {
         let hasChanges = false;
@@ -125,6 +126,7 @@ export function createState(initialValue, context = null, treatAsSingleEntity = 
                     return state[key];
                 };
                 propertyGetter.$$isState = true;
+                propertyGetter.$$setState = setState[key];
                 propertyGetter.$$subscribe = listener => {
                     propertyListeners[key].add(listener);
                     return () => propertyListeners[key].delete(listener);
