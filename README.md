@@ -11,14 +11,14 @@ Extml simplifies the creation and management of ExtJS components through an intu
 - [Core Concepts](#core-concepts)
 - [Installation](#installation)
 - [Examples](#examples)
-    - [Basic Example](#basic-example)
-    - [Advanced Example](#advanced-example)
-    - [Integration with ExtJS Application](#integration-with-extjs-application)
-    - [Using the For Component](#using-the-for-component)
+  - [Basic Example](#basic-example)
+  - [Advanced Example](#advanced-example)
+  - [Integration with ExtJS Application](#integration-with-extjs-application)
+  - [Using the For Component](#using-the-for-component)
 - [Key Features](#key-features)
-    - [State Management](#state-management)
-    - [Reactive Components](#reactive-components)
-    - [Scoped Styling](#scoped-styling)
+  - [State Management](#state-management)
+  - [Reactive Components](#reactive-components)
+  - [Scoped Styling](#scoped-styling)
 - [Component Guidelines](#component-guidelines)
 - [API Reference](#api-reference)
 - [License](#license)
@@ -37,6 +37,13 @@ Extml allows developers to:
 
 ## Installation
 
+### Alternative Installation
+
+Use Extml from a CDN:
+
+- **UMD:** [https://cdn.jsdelivr.net/npm/extml/dist/extml.umd.min.js](https://cdn.jsdelivr.net/npm/extml/dist/extml.umd.min.js)
+- **ES:** [https://cdn.jsdelivr.net/npm/extml/dist/extml.es.min.js](https://cdn.jsdelivr.net/npm/extml/dist/extml.es.min.js)
+
 Install Extml via npm:
 
 ```bash
@@ -49,7 +56,7 @@ $ npm install -D extml
 
 ### Live Demo
 
-Try Extml live on [Sencha Fiddle](https://fiddle.sencha.com/#view/editor&fiddle/3lv6).
+Try Extml live on [Sencha Fiddle](https://fiddle.sencha.com/#view/editor\&fiddle/3lv6).
 
 ### Basic Example
 
@@ -255,6 +262,41 @@ h`
 
 ## API Reference
 
+### `toggleState`
+
+**Description:** Toggles the value of a reactive state between `true` and `false`.
+
+**Parameters:**
+
+- `state` (function): The reactive state to toggle.
+
+**Examples:**
+
+1. Toggling a single boolean state:
+
+   ```javascript
+   import { createState, toggleState } from 'extml';
+
+   const [myState] = createState(false);
+   toggleState(myState);
+   console.log(myState()); // true
+   toggleState(myState);
+   console.log(myState()); // false
+   ```
+
+2. Toggling a property within a state object:
+
+   ```javascript
+   import { createState, toggleState } from 'extml';
+
+   const [state] = createState({ done: false, text: 'Hello' });
+   toggleState(state.done);
+   console.log(state.text()); // "Hello"
+   console.log(state.done()); // true
+   toggleState(state.done);
+   console.log(state.done()); // false
+   ```
+
 ### `createState`
 
 **Description:** Creates a reactive state object.
@@ -309,6 +351,27 @@ const derived = createDerivedState(() => value() * 2, value);
 ### `createRef`
 
 **Description:** Creates a reference object for DOM or component tracking.
+
+### `createExtRef`
+
+**Description:** Creates a reference object for tracking ExtJS components instead of DOM elements.
+
+**Examples:**
+
+```javascript
+import { createExtRef } from 'extml';
+
+const extRef = createExtRef();
+
+// Later in your component:
+h`
+    <ext-panel ref=${extRef}></ext-panel>
+`;
+
+// Access the ExtJS component:
+const extComponent = extRef();
+console.log(extComponent.xtype); // "panel"
+```
 
 ---
 
