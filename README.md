@@ -345,7 +345,7 @@ const isPositive = conditionalState(value, 'Positive', 'Negative');
 **Example:**
 
 ```javascript
-const derived = createDerivedState(() => value() * 2, value);
+const derived = createDerivedState(() => value() * 2);
 ```
 
 ### `createRef`
