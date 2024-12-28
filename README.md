@@ -179,8 +179,7 @@ Ext.application({
 ### Using the For Component
 
 ```javascript
-import { h } from "extml";
-import For from "./parser.js";
+import { h, For } from "extml";
 
 function listComponent(items) {
     return h`
