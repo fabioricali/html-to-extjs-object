@@ -1,4 +1,4 @@
-/* Extml, version: 2.43.0 - March 14, 2025 18:07:18 */
+/* Extml, version: 2.44.0 - March 14, 2025 18:19:12 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1051,13 +1051,20 @@ function setActiveTracker(tracker) {
     // Eseguiamo l'effetto inizialmente se richiesto
     if (runInitially) runEffect();
 
+    // const unsubscribes = dependencies.map(dep => {
+    //     if (!dep || typeof dep !== "object" || typeof dep.$$subscribe !== "function") {
+    //         throw new Error("Dependencies must be objects with the method $$subscribe");
+    //     }
+    //     return dep.$$subscribe(runEffect);
+    // });
+
     const unsubscribes = dependencies.map(dep => {
-        if (!dep || typeof dep !== "object" || typeof dep.$$subscribe !== "function") {
+        if (dep && typeof dep.$$subscribe === "function") {
+            return dep.$$subscribe(runEffect);
+        } else {
             throw new Error("Dependencies must be objects with the method $$subscribe");
         }
-        return dep.$$subscribe(runEffect);
     });
-
 
     return () => {
         if (typeof cleanup === "function") cleanup(); // Cleanup finale
