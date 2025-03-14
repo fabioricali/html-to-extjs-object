@@ -20,13 +20,20 @@ export default function createEffect(effect, dependencies, runInitially = false)
     // Eseguiamo l'effetto inizialmente se richiesto
     if (runInitially) runEffect();
 
+    // const unsubscribes = dependencies.map(dep => {
+    //     if (!dep || typeof dep !== "object" || typeof dep.$$subscribe !== "function") {
+    //         throw new Error("Dependencies must be objects with the method $$subscribe");
+    //     }
+    //     return dep.$$subscribe(runEffect);
+    // });
+
     const unsubscribes = dependencies.map(dep => {
-        if (!dep || typeof dep !== "object" || typeof dep.$$subscribe !== "function") {
+        if (dep && typeof dep.$$subscribe === "function") {
+            return dep.$$subscribe(runEffect);
+        } else {
             throw new Error("Dependencies must be objects with the method $$subscribe");
         }
-        return dep.$$subscribe(runEffect);
     });
-
 
     return () => {
         if (typeof cleanup === "function") cleanup(); // Cleanup finale
