@@ -1,4 +1,4 @@
-/* Extml, version: 2.42.0 - December 28, 2024 14:44:07 */
+/* Extml, version: 2.43.0 - March 14, 2025 18:07:18 */
 const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -1038,24 +1038,30 @@ function setActiveTracker(tracker) {
         throw new Error("Dependencies must be an array");
     }
 
-    // Run the effect initially if requested
-    if (runInitially) effect();
+    let cleanup; // Variabile per memorizzare il cleanup dell'effetto
+
+    // Funzione per eseguire l'effetto e gestire il cleanup
+    const runEffect = () => {
+        if (typeof cleanup === "function") {
+            cleanup(); // Puliamo prima di eseguire un nuovo effetto
+        }
+        cleanup = effect(); // Salviamo il cleanup restituito dall'effetto
+    };
+
+    // Eseguiamo l'effetto inizialmente se richiesto
+    if (runInitially) runEffect();
 
     const unsubscribes = dependencies.map(dep => {
-        if (dep && typeof dep.$$subscribe === "function") {
-            // Dependency is a reactive object with $$subscribe method
-            return dep.$$subscribe(() => effect());
-        } else {
+        if (!dep || typeof dep !== "object" || typeof dep.$$subscribe !== "function") {
             throw new Error("Dependencies must be objects with the method $$subscribe");
         }
+        return dep.$$subscribe(runEffect);
     });
 
+
     return () => {
-        unsubscribes.forEach(unsubscribe => {
-            if (typeof unsubscribe === "function") {
-                unsubscribe();
-            }
-        });
+        if (typeof cleanup === "function") cleanup(); // Cleanup finale
+        unsubscribes.forEach(unsub => unsub?.());
     };
 }function createPropertyObserver(target, path, callback = null) {
     if (typeof target !== "object" || target === null) {
