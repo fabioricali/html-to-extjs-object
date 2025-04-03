@@ -1,4 +1,4 @@
-/* Extml, version: 2.44.0 - March 14, 2025 18:19:12 */
+/* Extml, version: 2.45.0 - April 3, 2025 16:19:32 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -594,6 +594,14 @@ function applyPropsToConfig(config, props) {
             );
         } else if (prop === 'controller' && typeof props[prop] === 'function') {
             config[prop] = props[prop]();
+        } else if (prop === 'bindState' && props[prop] && props[prop].$$setState) {
+            config.listeners = config.listeners || [];
+            config.listeners.push(createEventObject('initialize', (o) => {
+                props[prop].$$setState(o.getValue());
+            }));
+            config.listeners.push(createEventObject('change', (o, v) => {
+                props[prop].$$setState(v);
+            }));
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
             config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
