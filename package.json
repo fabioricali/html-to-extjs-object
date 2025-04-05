@@ -1,6 +1,6 @@
 {
   "name": "extml",
-  "version": "2.45.0",
+  "version": "2.45.1",
   "description": "Converts html tagged templates to ExtJS component object.",
   "main": "src/index.js",
   "module": "dist/extml.es.js",
