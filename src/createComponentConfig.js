@@ -51,7 +51,7 @@ function applyPropsToConfig(config, props) {
         } else if (prop === 'controller' && typeof props[prop] === 'function') {
             config[prop] = props[prop]();
         } else if (prop === 'bindState' && props[prop] && props[prop].$$setState) {
-            config.listeners = config.listeners || [];
+            //config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
                 props[prop].$$setState(o.getValue());
             }));
@@ -59,7 +59,7 @@ function applyPropsToConfig(config, props) {
                 props[prop].$$setState(v);
             }));
         } else if (prop === 'ref' && props[prop] && props[prop].$$isRef) {
-            config.listeners = config.listeners || [];
+            //config.listeners = config.listeners || [];
             config.listeners.push(createEventObject('initialize', (o) => {
                 if (props[prop].$$isExtRef) {
                     props[prop](o);
@@ -78,7 +78,7 @@ function applyPropsToConfig(config, props) {
 
             config[prop] = buildAttributeValue();
 
-            config.listeners = config.listeners || [];
+            //config.listeners = config.listeners || [];
 
             config.listeners.push(createEventObject('initialize', (o) => {
                 o.$$attributesStateListeners = [];
