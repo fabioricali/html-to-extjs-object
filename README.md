@@ -372,6 +372,24 @@ const extComponent = extRef();
 console.log(extComponent.xtype); // "panel"
 ```
 
+### `bindState`
+
+**Description:** This property allows you to link a state to a component that works with change event like form fields.
+
+**Examples:**
+
+```javascript
+import { createState } from 'extml';
+
+const [myState] = createState();
+
+// Then in your component:
+h`
+    <ext-textfield bindState=${myState} placeholder="write here"></ext-textfield>
+    <div>value: ${myState}</div>
+`;
+```
+
 ---
 
 ## License
