@@ -1,4 +1,4 @@
-/* Extml, version: 2.45.2 - April 5, 2025 10:07:49 */
+/* Extml, version: 2.45.3 - April 9, 2025 10:19:19 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -631,8 +631,12 @@ function applyPropsToConfig(config, props) {
                     if (typeof item === 'function' && item.$$isState) {
                         o.$$attributesStateListeners.push(item.$$subscribe(value => {
                             let setterName = createSetterName(prop);
+                            if (prop === 'class' && !isHtmlType(o.xtype)) {
+                                setterName = 'setCls';
+                            }
                             if (typeof o[setterName] === 'function' && !o.destroyed) {
-                                o[createSetterName(prop)](buildAttributeValue());
+                                // o[createSetterName(prop)](buildAttributeValue());
+                                o[setterName](buildAttributeValue());
                             }
                         }));
                     }
@@ -650,8 +654,12 @@ function applyPropsToConfig(config, props) {
                 config.listeners.push(createEventObject('initialize', (o) => {
                     o.$$stateListener = propsProp.$$subscribe(value => {
                         let setterName = createSetterName(prop);
+                        if (prop === 'class' && !isHtmlType(o.xtype)) {
+                            setterName = 'setCls';
+                        }
                         if (typeof o[setterName] === 'function'  && !o.destroyed) {
-                            o[createSetterName(prop)](value);
+                            // o[createSetterName(prop)](value);
+                            o[setterName](value);
                         }
                     });
                 }));
