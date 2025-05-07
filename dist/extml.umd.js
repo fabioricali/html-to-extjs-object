@@ -1,4 +1,4 @@
-/* Extml, version: 2.45.3 - April 9, 2025 10:19:19 */
+/* Extml, version: 2.45.4 - May 7, 2025 09:59:18 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -625,19 +625,28 @@ function applyPropsToConfig(config, props) {
             //config.listeners = config.listeners || [];
 
             config.listeners.push(createEventObject('initialize', (o) => {
+
+                function doSetters() {
+                    let setterName = createSetterName(prop);
+                    if (prop === 'class' && !isHtmlType(o.xtype)) {
+                        setterName = 'setCls';
+                    }
+                    if (typeof o[setterName] === 'function' && !o.destroyed) {
+                        o[setterName](buildAttributeValue());
+                    }
+                }
+
                 o.$$attributesStateListeners = [];
                 // per ogni state sottoscrivo un listener per ricostruire nuovamente il valore dell'attributo ad ogni cambiamento
                 props[prop].forEach(item => {
                     if (typeof item === 'function' && item.$$isState) {
+
+                        // imposto i valori subito all'initialize
+                        doSetters();
+
+                        // imposto i valori in modo reattivo
                         o.$$attributesStateListeners.push(item.$$subscribe(value => {
-                            let setterName = createSetterName(prop);
-                            if (prop === 'class' && !isHtmlType(o.xtype)) {
-                                setterName = 'setCls';
-                            }
-                            if (typeof o[setterName] === 'function' && !o.destroyed) {
-                                // o[createSetterName(prop)](buildAttributeValue());
-                                o[setterName](buildAttributeValue());
-                            }
+                            doSetters();
                         }));
                     }
                 });
