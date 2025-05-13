@@ -1,4 +1,4 @@
-/* Extml, version: 2.45.4 - May 7, 2025 09:59:18 */
+/* Extml, version: 2.45.5 - May 13, 2025 17:06:01 */
 (function(g,f){typeof exports==='object'&&typeof module!=='undefined'?f(exports):typeof define==='function'&&define.amd?define(['exports'],f):(g=typeof globalThis!=='undefined'?globalThis:g||self,f(g.extml={}));})(this,(function(exports){'use strict';const STYLE_PREFIX = 'extml-style-';
 
 function composeStyleInner(cssContent, tag) {
@@ -696,7 +696,8 @@ function configureChildren(config, children, type) {
             addToArray(config, 'columns', child);
         } else if (child.xtype === 'menu' && type === 'button') {
             addSingle(config, 'menu', child);
-        } else if (child.xtype === 'button' && columnTypes.includes(type)) {
+        //} else if (child.xtype === 'button' && columnTypes.includes(type)) {
+        } else if (child.xtype !== 'widgetcell' && columnTypes.includes(type)) {
             addSingle(config, 'cell', {
                 xtype: 'widgetcell',
                 forceWidth: true,
@@ -706,7 +707,8 @@ function configureChildren(config, children, type) {
                 }
             });
             addToArray(config.cell.widget, 'items', child);
-        } else if (child.xtype === 'button' && type === 'widgetcell') {
+        // } else if (child.xtype === 'button' && type === 'widgetcell') {
+        } else if (child.xtype !== 'widgetcell' && type === 'widgetcell') {
             // create widget child container
             addSingle(config, 'widget', {
                 xtype: 'container',
