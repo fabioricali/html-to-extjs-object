@@ -295,7 +295,7 @@ describe('converts html to extjs object', function () {
                 </ext-widgetcell>
             </ext-column>
         `;
-        // console.log(JSON.stringify(result, null, 4))
+        console.log(JSON.stringify(result, null, 4))
         assert.equal(result.cell.xtype, 'widgetcell');
         assert.equal(result.cell.widget.items[0].xtype, 'button');
     });

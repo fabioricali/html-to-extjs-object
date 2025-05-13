@@ -152,7 +152,8 @@ function configureChildren(config, children, type) {
             addToArray(config, 'columns', child);
         } else if (child.xtype === 'menu' && type === 'button') {
             addSingle(config, 'menu', child);
-        } else if (/*child.xtype === 'button' && */columnTypes.includes(type)) {
+        //} else if (child.xtype === 'button' && columnTypes.includes(type)) {
+        } else if (child.xtype !== 'widgetcell' && columnTypes.includes(type)) {
             addSingle(config, 'cell', {
                 xtype: 'widgetcell',
                 forceWidth: true,
@@ -162,7 +163,8 @@ function configureChildren(config, children, type) {
                 }
             });
             addToArray(config.cell.widget, 'items', child);
-        } else if (/*child.xtype === 'button' && */type === 'widgetcell') {
+        // } else if (child.xtype === 'button' && type === 'widgetcell') {
+        } else if (child.xtype !== 'widgetcell' && type === 'widgetcell') {
             // create widget child container
             addSingle(config, 'widget', {
                 xtype: 'container',
