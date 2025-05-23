@@ -1,6 +1,8 @@
 import {h} from "./parser.js";
 
-export default function For({ each, effect, getKey = (item) => item.id || item.name, tag = 'ext-container', attributes = {} }) {
+export default function For({ each, effect, getKey = (item) => item.id || item.key || item.time || item.name, tag = 'ext-container', attributes = {} }) {
+    each = each || []
+
     function onInitialize(component) {
         const childStateMap = new Map(); // Mappa per gestire lo stato dei figli
 
